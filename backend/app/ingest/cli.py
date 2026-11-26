@@ -3,6 +3,7 @@ import argparse
 from collections import Counter
 from pathlib import Path
 
+from app.ingest.chunker import chunk_paragraphs
 from app.ingest.pdf_parser import parse_pdf
 
 
@@ -15,8 +16,9 @@ def main() -> None:
         paragraphs = parse_pdf(str(pdf))
         kinds = Counter(p.kind for p in paragraphs)
         pages = len({p.page for p in paragraphs})
-        print(f"{pdf.name}: {pages} páginas, {dict(kinds)}")
-        # TODO: agrupar en fragmentos por sección, generar embeddings y guardar en la base
+        chunks = chunk_paragraphs(paragraphs)
+        print(f"{pdf.name}: {pages} páginas, {dict(kinds)}, {len(chunks)} fragmentos")
+        # TODO: generar embeddings y guardar en la base
 
 
 if __name__ == "__main__":
