@@ -10,12 +10,20 @@ docker compose up -d
 cd backend
 cp .env.example .env
 pip install -r requirements-dev.txt
+set -a && source .env && set +a
+python -m scripts.download_guides    # descarga las guías de corpus.json a guias/ y las ingesta
 uvicorn app.main:app --reload        # http://localhost:8000/docs
 
 # Frontend
 cd frontend
 npm install && npm run dev           # http://localhost:3000
 ```
+
+## Corpus
+
+`backend/corpus.json` lista las guías con sus URL oficiales de DIPRECE. `python -m scripts.download_guides` (desde `backend/`) descarga cada PDF a `backend/guias/` (fuera de Git) y lo ingesta. Reingestar es seguro: si el PDF no cambió (mismo SHA-256) se omite. Para sumar una guía, agrega una entrada con el enlace directo al PDF; algunas filas de la tabla de DIPRECE enlazan a una página HTML y el script lo rechaza.
+
+Hay que correrlo con `-m`: `python scripts/download_guides.py` falla con `No module named 'app'`, porque Python agrega al path la carpeta del script y no la del proyecto.
 
 ## Esquema de la base de datos
 
@@ -32,6 +40,7 @@ Decisiones:
 ## Limitaciones conocidas
 
 - **Flujogramas:** si son imágenes, su contenido se pierde. Si están dibujados con texto vectorial (como el algoritmo de la guía de DM2), la página se detecta y se descarta, porque sus etiquetas sueltas ("Sí", "No", "¿Cumple meta?") solo meten ruido. En ambos casos, la información suele estar también en el texto de la guía.
+- **Reingesta tras cambiar el parser:** la ingesta decide por el SHA-256 del PDF, así que un cambio en el parser o el chunker no reingesta nada por sí solo. Hay que borrar el documento (`DELETE FROM documents WHERE slug = ...`) y volver a correr el script.
 - **Etiquetas de flujograma alineadas:** si varias cajas comparten exactamente la misma línea base, PyMuPDF las une en una sola línea y la página puede no detectarse como flujograma.
 
 ## Casos encontrados en guías reales
@@ -49,3 +58,13 @@ Al procesar la guía de DM2 del MINSAL (2016-2017) aparecieron casos que el pars
 | 7 | "Recomendación N" y su pregunta, del mismo tamaño que "3.1 …" | La sección perdía "3.1 PRIMERA LÍNEA" y el número de recomendación | Títulos seguidos del mismo nivel se unen; un título numerado manda sobre uno sin número del mismo tamaño |
 | 8 | Ítems de lista en negrita ("• Debut inestable:") | Se tomaban como títulos y sacaban la lista del fragmento de la recomendación | Un ítem con viñeta nunca es título |
 | 9 | Viñeta sola en su propia línea ("−−") | Párrafos que eran solo un símbolo | La viñeta se pega al ítem que sigue |
+
+Al sumar la guía de Depresión (MINSAL 2013) aparecieron cinco casos más:
+
+| # | Caso | Efecto | Corrección |
+|---|---|---|---|
+| 10 | Títulos de portada ("Depresión", "en personas de 15 años y más") con letra más grande que los capítulos | Encabezaban la ruta de sección de los 316 fragmentos; con peso `A`, "depresión" puntuaba alto en todos | Un título sin número más grande que los capítulos numerados es de portada y no entra en la ruta |
+| 11 | Índice de la guía (líneas con puntos guía en Depresión, tabla en DM2) | Fragmentos con el nombre de todas las secciones, que aparecían en cualquier búsqueda | Se descartan las líneas con puntos guía, las tablas cuya última columna son números de página crecientes y el título "ÍNDICE" |
+| 12 | Rótulo de tabla ("Tabla Nº 1: …") en negrita, a veces en dos líneas | Se tomaba como título y quedaba en la ruta de sección del texto que seguía a la tabla | El rótulo es de tipo `caption`, se une si sigue en otra línea y viaja en el fragmento de su tabla |
+| 13 | Llamada a nota al pie en superíndice ("Presentación clínica¹") | El título quedaba como "Presentación clínica1" | En los títulos se quitan los superíndices; en el texto se conservan ("kg/m²") |
+| 14 | Tamaños de letra inconsistentes (9 niveles; "Epidemiología" más grande que "1.1.") | La jerarquía de secciones salía desordenada | La numeración manda: 5.1.2 cuelga de 5.1 y de 5. Una numeración que retrocede ("1. Fármaco versus Placebo" dentro de 5.3.2) es una lista; los anexos y "REFERENCIAS" reinician la ruta |

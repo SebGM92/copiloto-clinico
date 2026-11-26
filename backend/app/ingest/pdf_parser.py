@@ -12,7 +12,7 @@ class Paragraph:
     page: int        # página física del PDF, desde 1 (la que abre /guia.pdf#page=N)
     para: int        # número de párrafo de contenido en esa página, desde 1 (0 en títulos)
     text: str
-    kind: str        # "heading" | "text" | "table"
+    kind: str        # "heading" | "text" | "table" | "caption" (título de tabla o figura)
     level: int = 0   # nivel del título (1 = más grande); 0 si no es título
 
 
@@ -33,6 +33,24 @@ FIGURE_MIN_DRAWINGS = 20
 
 TERMINAL = re.compile(r"[.:;!?]$")
 BULLET = re.compile(r"^[•·◦▪\-−–—]")  # un ítem de lista nunca es título, aunque vaya en negrita
+
+# "Tabla Nº 1: …", "Figura 2 …": rótulo de una tabla o figura, no un título de sección
+CAPTION = re.compile(r"^(tabla|cuadro|figura|gr[aá]fico)\s*(n[º°o]\.?\s*)?\d+", re.IGNORECASE)
+# Línea de índice: "1.2. Criterios diagnósticos..............16"
+TOC_LEADER = re.compile(r"\.{8,}")
+TOC_TITLE = re.compile(r"^(í|i)ndice( general)?$|^(tabla de )?contenidos?$", re.IGNORECASE)
+# Numeración de sección: "1.", "3.1", "5.1.2." (hasta 2 dígitos: "2016 - 2017" no es una sección) y anexos
+SECTION_NUMBER = re.compile(r"^(\d{1,2}(?:\.\d{1,2})*)\.?\s")
+ANNEX = re.compile(r"^anexo\s+(\d{1,2})\b", re.IGNORECASE)
+
+
+def section_key(text: str) -> tuple[int, ...] | None:
+    """(5, 1, 2) para "5.1.2. Síntesis"; los anexos van después de todas las secciones."""
+    if m := ANNEX.match(text):
+        return (1000 + int(m.group(1)),)
+    if m := SECTION_NUMBER.match(text):
+        return tuple(int(x) for x in m.group(1).split("."))
+    return None
 
 
 def _join_lines(lines: list[str]) -> str:
@@ -62,6 +80,17 @@ def _table_markdown(rows: list[list[str | None]]) -> str:
     lines = ["| " + " | ".join(header) + " |", "|" + "---|" * len(header)]
     lines += ["| " + " | ".join(row) + " |" for row in body]
     return "\n".join(lines)
+
+
+def _is_toc_table(rows: list[list[str]]) -> bool:
+    """Índice armado como tabla: la última columna son números de página que solo crecen."""
+    if len(rows) < 4:
+        return False
+    last = [row[-1].strip() for row in rows]
+    if not all(re.fullmatch(r"\d{1,3}", x) for x in last):
+        return False
+    pages = [int(x) for x in last]
+    return pages == sorted(pages) and not any(re.fullmatch(r"[\d.,\s]*", row[0]) for row in rows)
 
 
 def _line_style(line: dict) -> tuple[float, bool]:
@@ -106,27 +135,33 @@ def _raw_blocks(doc: pymupdf.Document) -> list[list[dict]]:
                     continue
                 style = _line_style(line)
                 text = "".join(s["text"] for s in line["spans"])
+                # Sin superíndices: "Presentación clínica¹" -> "Presentación clínica" (solo para títulos)
+                plain = "".join(s["text"] for s in line["spans"] if not s["flags"] & 1)
                 x0, y0, x1, y1 = line["bbox"]
                 if runs and runs[-1]["style"] == style:
                     r = runs[-1]
                     r["lines"].append(text)
+                    r["plain"].append(plain)
                     r["y1"], r["x0"], r["x1"] = y1, min(r["x0"], x0), max(r["x1"], x1)
                 else:
-                    runs.append({"style": style, "lines": [text], "x0": x0, "y0": y0, "x1": x1, "y1": y1})
+                    runs.append({"style": style, "lines": [text], "plain": [plain],
+                                 "x0": x0, "y0": y0, "x1": x1, "y1": y1})
             for run in runs:
                 blocks.append({
                     "x0": run["x0"], "y0": run["y0"], "x1": run["x1"], "y1": run["y1"],
                     "width": width, "height": height,
-                    "text": _join_lines(run["lines"]),
+                    "text": _join_lines(run["lines"]), "plain": _join_lines(run["plain"]),
                     "size": run["style"][0], "bold": run["style"][1], "kind": "text",
                 })
         for t in tables:
             # get_textbox por celda conserva los espacios mejor que t.extract()
             rows = [[page.get_textbox(cell) if cell else "" for cell in row.cells] for row in t.rows]
+            clean = [[_join_lines((c or "").splitlines()) for c in row] for row in rows]
+            text = _table_markdown(rows)
             blocks.append({
                 "x0": t.bbox[0], "y0": t.bbox[1], "x1": t.bbox[2], "y1": t.bbox[3],
-                "width": width, "height": height,
-                "text": _table_markdown(rows), "size": 0, "bold": False, "kind": "table",
+                "width": width, "height": height, "text": text, "plain": text, "size": 0, "bold": False,
+                "kind": "toc" if _is_toc_table(clean) else "table",
             })
         if _is_figure_page(page, blocks):
             for b in blocks:
@@ -162,8 +197,8 @@ def parse_pdf(path: str) -> list[Paragraph]:
         para = 0
         for b in blocks:
             text = b["text"]
-            if b["kind"] == "figure":
-                continue
+            if b["kind"] in ("figure", "toc") or (b["kind"] == "text" and TOC_LEADER.search(text)):
+                continue  # flujograma vectorial o índice de la guía: no es contenido
             if _in_margin(b) and (_signature(text) in repeated or text.strip().isdigit()):
                 continue  # encabezado, pie o número de página
             if b["kind"] == "text" and not re.search(r"\w", text):
@@ -180,9 +215,21 @@ def parse_pdf(path: str) -> list[Paragraph]:
             elif kind == "text" and b["bold"] and len(text) < 120 and not text.endswith("."):
                 kind, level = "heading", len(heading_sizes) + 1
 
+            prev = paragraphs[-1] if paragraphs else None
+            if kind == "heading":
+                text = b["plain"] or text  # sin llamadas a nota al pie
+                if TOC_TITLE.match(text.strip()):
+                    continue  # el título "ÍNDICE": su contenido ya se descartó
+                if CAPTION.match(text):
+                    paragraphs.append(Paragraph(page=page_no, para=0, text=text, kind="caption"))
+                    continue
+                if (prev and prev.kind == "caption" and prev.page == page_no
+                        and section_key(text) is None):
+                    prev.text = f"{prev.text} {text}"  # el rótulo de la tabla siguió en otra línea
+                    continue
+
             # Párrafo que sigue al anterior: empieza en minúscula y el anterior quedó sin cerrar.
             # Pasa al cambiar de página o cuando la negrita cambia a mitad de párrafo.
-            prev = paragraphs[-1] if paragraphs else None
             if (kind == "text" and text[:1].islower() and prev and prev.kind == "text"
                     and not TERMINAL.search(prev.text)):
                 prev.text = _join_lines([prev.text, text])

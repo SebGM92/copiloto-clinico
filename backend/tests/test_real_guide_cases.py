@@ -209,3 +209,161 @@ def test_lone_bullet_glyph_is_attached_to_its_item(tmp_path):
     ps = build(tmp_path, page)
     assert not any(not any(ch.isalnum() for ch in p.text) for p in ps)
     assert any(p.text == "– Síntomas ficticios y glicemia ficticia elevada." for p in ps)
+
+
+# ═══ Casos encontrados en la guía de Depresión (MINSAL 2013) ═════════════════
+
+def _h(text, level, page=1):
+    return Paragraph(page=page, para=0, text=text, kind="heading", level=level)
+
+
+def _t(text, page=1):
+    return Paragraph(page=page, para=1, text=text, kind="text")
+
+
+def _sections(paras):
+    return {c.text: c.section for c in chunk_paragraphs(paras)}
+
+
+# 10 ─ Títulos de portada encabezando todas las secciones ─────────────────────
+def test_cover_titles_bigger_than_chapters_stay_out_of_the_section_path():
+    paras = [
+        _h("Depresión", 1), _h("en personas de 15 años y más", 3), _t("Portada ficticia."),
+        _h("RECOMENDACIONES CLAVE", 6, page=11), _t("Recomendación clave ficticia.", page=11),
+        _h("1. INTRODUCCIÓN", 6, page=13), _t("Introducción ficticia.", page=13),
+    ]
+    s = _sections(paras)
+    assert s["Recomendación clave ficticia."] == "RECOMENDACIONES CLAVE"
+    assert s["Introducción ficticia."] == "1. INTRODUCCIÓN"
+
+
+# 11 ─ Índice de la guía guardado como contenido ──────────────────────────────
+def test_table_of_contents_is_not_content(tmp_path):
+    def toc_page(c):
+        y = heading(c, H - 100, "ÍNDICE")
+        for entry, page in [("1. INTRODUCCIÓN", 5), ("1.1. Descripción del problema", 5),
+                            ("2. ALCANCE DE LA GUÍA", 9), ("3. RECOMENDACIONES", 12)]:
+            y = lines(c, y, [f"{entry}{'.' * 60}{page}"], gap=2)
+
+    def toc_table_page(c):
+        top, cw, rh = H - 120, 200, 18
+        rows = [["AUTORES", "4"], ["1. INTRODUCCIÓN", "8"], ["2. MÉTODOS", "11"], ["3. RECOMENDACIONES", "14"]]
+        c.setFont("Helvetica", 10)
+        for i, row in enumerate(rows):
+            for j, cell in enumerate(row):
+                c.drawString(X + j * cw + 4, top - i * rh - 13, cell)
+        for i in range(len(rows) + 1):
+            c.line(X, top - i * rh, X + 2 * cw, top - i * rh)
+        for j in range(3):
+            c.line(X + j * cw, top, X + j * cw, top - len(rows) * rh)
+
+    def body(c):
+        y = heading(c, H - 100, "1. INTRODUCCIÓN")
+        lines(c, y, [BODY[:90], BODY[90:]] * 3)
+
+    ps = build(tmp_path, toc_page, toc_table_page, body)
+    assert {p.page for p in ps} == {3}  # nada de las páginas de índice (líneas con puntos ni tabla)
+    assert not any("ÍNDICE" in p.text or "AUTORES" in p.text for p in ps)
+    assert chunk_paragraphs(ps)[0].section == "1. INTRODUCCIÓN"
+
+
+def test_numeric_table_that_is_not_an_index_is_kept(tmp_path):
+    def page(c):
+        lines(c, H - 80, [BODY[:90], BODY[90:]])
+        top, cw, rh = H - 140, 150, 18
+        rows = [["Edad", "Casos"], ["15-24", "320"], ["25-44", "210"], ["45-64", "150"], ["65 y más", "90"]]
+        c.setFont("Helvetica", 10)
+        for i, row in enumerate(rows):
+            for j, cell in enumerate(row):
+                c.drawString(X + j * cw + 4, top - i * rh - 13, cell)
+        for i in range(len(rows) + 1):
+            c.line(X, top - i * rh, X + 2 * cw, top - i * rh)
+        for j in range(3):
+            c.line(X + j * cw, top, X + j * cw, top - len(rows) * rh)
+
+    table = next(p for p in build(tmp_path, page) if p.kind == "table")
+    assert "15-24" in table.text and "320" in table.text
+
+
+# 12 ─ Rótulo de tabla ("Tabla Nº 1: …") tomado como título de sección ─────────
+def test_table_caption_travels_with_its_table(tmp_path):
+    def page(c):
+        y = heading(c, H - 100, "1. INTRODUCCIÓN")
+        y = lines(c, y, [BODY[:90], BODY[90:]])
+        y = heading(c, y, "Tabla Nº 1: Prevalencia ficticia de depresión en Chile, según", 10)
+        y = heading(c, y + 10, "DSM ficticio (entrevista estructurada)", 10)
+        top, cw, rh = y, 150, 18
+        rows = [["Grupo", "Prevalencia"], ["Hombres", "5,5 %"], ["Mujeres", "11,2 %"]]
+        c.setFont("Helvetica", 10)
+        for i, row in enumerate(rows):
+            for j, cell in enumerate(row):
+                c.drawString(X + j * cw + 4, top - i * rh - 13, cell)
+        for i in range(len(rows) + 1):
+            c.line(X, top - i * rh, X + 2 * cw, top - i * rh)
+        for j in range(3):
+            c.line(X + j * cw, top, X + j * cw, top - len(rows) * rh)
+        lines(c, top - len(rows) * rh - 25, ["Fuente: encuesta ficticia. " + BODY])
+
+    ps = build(tmp_path, page)
+    caption = next(p for p in ps if p.kind == "caption")
+    assert caption.text == ("Tabla Nº 1: Prevalencia ficticia de depresión en Chile, según "
+                            "DSM ficticio (entrevista estructurada)")
+    chunks = chunk_paragraphs(ps)
+    table_chunk = next(c for c in chunks if any(p.kind == "table" for p in c.paragraphs))
+    assert [p.kind for p in table_chunk.paragraphs] == ["caption", "table"]
+    assert all(c.section == "1. INTRODUCCIÓN" for c in chunks)  # el rótulo no queda en la ruta
+
+
+def test_caption_without_table_stays_as_text():
+    paras = [_h("1. INTRODUCCIÓN", 1), Paragraph(1, 0, "Figura 2: Algoritmo ficticio", "caption"),
+             _t("Texto después de la figura.")]
+    (chunk,) = chunk_paragraphs(paras)
+    assert chunk.text == "Figura 2: Algoritmo ficticio\n\nTexto después de la figura."
+
+
+# 13 ─ Llamadas a nota al pie pegadas al título ("Presentación clínica¹") ──────
+def test_footnote_markers_are_removed_from_headings_but_not_from_text(tmp_path):
+    def page(c):
+        t = c.beginText(X, H - 100)
+        t.setFont("Helvetica-Bold", 14)
+        t.textOut("1.3.1. Presentación clínica")
+        t.setFont("Helvetica-Bold", 7)
+        t.setRise(3)  # elevación pequeña, como en la guía real: PyMuPDF lo deja en la línea y lo marca superíndice
+        t.textOut("1")
+        t.setRise(0)
+        c.drawText(t)
+        t = c.beginText(X, H - 130)
+        t.setFont("Helvetica", 10)
+        t.textOut("Pacientes ficticios con IMC sobre 30 kg/m")
+        t.setFont("Helvetica", 6)
+        t.setRise(3)
+        t.textOut("2")
+        t.setRise(0)
+        t.setFont("Helvetica", 10)
+        t.textOut(" en este documento de prueba.")
+        c.drawText(t)
+        lines(c, H - 160, [BODY[:90], BODY[90:]] * 3)
+
+    ps = build(tmp_path, page)
+    assert next(p for p in ps if p.kind == "heading").text == "1.3.1. Presentación clínica"
+    assert any("kg/m2" in p.text for p in ps if p.kind == "text")
+
+
+# 14 ─ La numeración define la jerarquía, no el tamaño de letra ───────────────
+def test_section_numbering_defines_the_hierarchy():
+    paras = [
+        _h("1. INTRODUCCIÓN", 6),
+        _h("1.1. Descripción del problema", 9), _t("A."),
+        _h("Epidemiología ficticia", 8), _t("B."),  # sin número y más grande que 1.1: cuelga de 1.1 igual
+        _h("5. RECOMENDACIONES", 6), _h("5.3. Tratamiento", 9), _h("5.3.2. Síntesis de Evidencia", 8),
+        _h("1. Fármaco versus Placebo", 8), _t("C."),  # numeración de lista dentro de 5.3.2: no es el capítulo 1
+        _h("ANEXO 1. Glosario ficticio", 6), _t("D."),
+        _h("REFERENCIAS", 6), _t("E."),
+    ]
+    s = _sections(paras)
+    assert s["A."] == "1. INTRODUCCIÓN > 1.1. Descripción del problema"
+    assert s["B."] == "1. INTRODUCCIÓN > 1.1. Descripción del problema > Epidemiología ficticia"
+    assert s["C."] == ("5. RECOMENDACIONES > 5.3. Tratamiento > 5.3.2. Síntesis de Evidencia > "
+                       "1. Fármaco versus Placebo")
+    assert s["D."] == "ANEXO 1. Glosario ficticio"
+    assert s["E."] == "REFERENCIAS"
