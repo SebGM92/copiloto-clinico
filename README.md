@@ -17,6 +17,18 @@ cd frontend
 npm install && npm run dev           # http://localhost:3000
 ```
 
+## Esquema de la base de datos
+
+Cada fragmento se guarda una vez con dos índices: un vector (`embedding`) para buscar por significado y un `tsvector` (`tsv`) para buscar por palabras. Los párrafos viajan como JSONB, así una cita (página y párrafo) se resuelve sin volver a leer el PDF.
+
+La configuración de texto `es_med` es la de español más `unaccent`: "hipertensión" e "hipertension" generan el mismo lexema, y siglas como "HbA1c" o "DM2" se conservan como términos buscables.
+
+Decisiones:
+
+- **El título de la sección pesa más (`A`) que el contenido (`B`).** Si la pregunta menciona "tratamiento farmacológico", gana el fragmento de esa sección y no uno que solo nombra el término de pasada.
+- **La columna `tsv` es generada.** PostgreSQL la recalcula sola al cambiar `section` o `content`, así que nunca queda desfasada del texto.
+- **HNSW con distancia coseno.** No necesita entrenarse con los datos, a diferencia de IVFFlat, y con unos miles de fragmentos responde en milisegundos.
+
 ## Limitaciones conocidas
 
 - **Flujogramas:** si son imágenes, su contenido se pierde. Si están dibujados con texto vectorial (como el algoritmo de la guía de DM2), la página se detecta y se descarta, porque sus etiquetas sueltas ("Sí", "No", "¿Cumple meta?") solo meten ruido. En ambos casos, la información suele estar también en el texto de la guía.
