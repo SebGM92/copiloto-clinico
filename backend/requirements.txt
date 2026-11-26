@@ -1,0 +1,9 @@
+fastapi==0.165.0
+uvicorn[standard]==0.54.0
+anthropic==2.11.0
+langgraph==1.2.24
+psycopg[binary]==3.3.9
+psycopg-pool==3.3.3
+pgvector==0.5.1
+pymupdf==2.1
+sentence-transformers==6.3.0
