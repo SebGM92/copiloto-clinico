@@ -4,7 +4,7 @@ from pathlib import Path
 import httpx
 
 GUIDES: dict[str, str] = {
-    # "nombre.pdf": "https://...",
+    "dm2_minsal.pdf": "https://diprece.minsal.cl/wrdprss_minsal/wp-content/uploads/2018/01/DIABETES-MELLITUS-TIPO-2-1.pdf",
 }
 
 OUT = Path(__file__).resolve().parent.parent / "data" / "guides"

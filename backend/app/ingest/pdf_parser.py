@@ -16,7 +16,23 @@ class Paragraph:
     level: int = 0   # nivel del título (1 = más grande); 0 si no es título
 
 
-MARGIN = 0.08  # 8 % superior e inferior de la página: zona de encabezados y pies
+MARGIN = 0.08  # 8 % de cada borde de la página: zona de encabezados y pies (también laterales)
+
+# Líneas que califican a la recomendación anterior. Nunca son título aunque vayan en negrita.
+STRENGTH = re.compile(
+    r"^(recomendaci[oó]n (fuerte|condicional|d[eé]bil)|grado de recomendaci[oó]n|"
+    r"nivel de evidencia|certeza (de la|en la) evidencia|calidad de (la )?evidencia)",
+    re.IGNORECASE,
+)
+
+# Página de flujograma dibujado con texto vectorial: muchas etiquetas cortas sobre muchos trazos
+FIGURE_MIN_RUNS = 20
+FIGURE_SHORT_RATIO = 0.6
+FIGURE_SHORT_CHARS = 40
+FIGURE_MIN_DRAWINGS = 20
+
+TERMINAL = re.compile(r"[.:;!?]$")
+BULLET = re.compile(r"^[•·◦▪\-−–—]")  # un ítem de lista nunca es título, aunque vaya en negrita
 
 
 def _join_lines(lines: list[str]) -> str:
@@ -25,8 +41,11 @@ def _join_lines(lines: list[str]) -> str:
         line = line.strip()
         if not line:
             continue
-        if text.endswith("-") and line[:1].islower():
-            text = text[:-1] + line          # "hiperten-" + "sión" -> "hipertensión"
+        # "hiperten-" + "sión" -> "hipertensión"; en tablas también "ESTU-" + "DIOS"
+        hyphenated = (text.endswith("-") and len(text) > 1 and text[-2].isalpha() and line[:1].isalpha()
+                      and (line[:1].islower() or text[-2].isupper()))
+        if hyphenated:
+            text = text[:-1] + line
         else:
             text = f"{text} {line}" if text else line
     return re.sub(r"\s+", " ", text).strip()
@@ -38,7 +57,7 @@ def _signature(text: str) -> str:
 
 
 def _table_markdown(rows: list[list[str | None]]) -> str:
-    clean = [[(cell or "").replace("\n", " ").strip() for cell in row] for row in rows]
+    clean = [[_join_lines((cell or "").splitlines()) for cell in row] for row in rows]
     header, body = clean[0], clean[1:]
     lines = ["| " + " | ".join(header) + " |", "|" + "---|" * len(header)]
     lines += ["| " + " | ".join(row) + " |" for row in body]
@@ -52,10 +71,25 @@ def _line_style(line: dict) -> tuple[float, bool]:
     return size, bold
 
 
+def _in_margin(b: dict) -> bool:
+    w, h = b["width"], b["height"]
+    return (b["y1"] < h * MARGIN or b["y0"] > h * (1 - MARGIN)
+            or b["x1"] < w * MARGIN or b["x0"] > w * (1 - MARGIN))
+
+
+def _is_figure_page(page: pymupdf.Page, blocks: list[dict]) -> bool:
+    """Flujograma con texto vectorial: etiquetas cortas y sueltas ("Sí", "No", "¿Cumple meta?")."""
+    runs = [b for b in blocks if b["kind"] == "text" and not _in_margin(b)]
+    if len(runs) < FIGURE_MIN_RUNS:
+        return False
+    short = sum(len(b["text"]) < FIGURE_SHORT_CHARS for b in runs) / len(runs)
+    return short >= FIGURE_SHORT_RATIO and len(page.get_drawings()) >= FIGURE_MIN_DRAWINGS
+
+
 def _raw_blocks(doc: pymupdf.Document) -> list[list[dict]]:
     pages = []
     for page in doc:
-        height = page.rect.height
+        width, height = page.rect.width, page.rect.height
         tables = page.find_tables().tables
         table_rects = [pymupdf.Rect(t.bbox) for t in tables]
         blocks = []
@@ -72,14 +106,17 @@ def _raw_blocks(doc: pymupdf.Document) -> list[list[dict]]:
                     continue
                 style = _line_style(line)
                 text = "".join(s["text"] for s in line["spans"])
+                x0, y0, x1, y1 = line["bbox"]
                 if runs and runs[-1]["style"] == style:
-                    runs[-1]["lines"].append(text)
-                    runs[-1]["y1"] = line["bbox"][3]
+                    r = runs[-1]
+                    r["lines"].append(text)
+                    r["y1"], r["x0"], r["x1"] = y1, min(r["x0"], x0), max(r["x1"], x1)
                 else:
-                    runs.append({"style": style, "lines": [text], "y0": line["bbox"][1], "y1": line["bbox"][3]})
+                    runs.append({"style": style, "lines": [text], "x0": x0, "y0": y0, "x1": x1, "y1": y1})
             for run in runs:
                 blocks.append({
-                    "y0": run["y0"], "y1": run["y1"], "height": height,
+                    "x0": run["x0"], "y0": run["y0"], "x1": run["x1"], "y1": run["y1"],
+                    "width": width, "height": height,
                     "text": _join_lines(run["lines"]),
                     "size": run["style"][0], "bold": run["style"][1], "kind": "text",
                 })
@@ -87,9 +124,14 @@ def _raw_blocks(doc: pymupdf.Document) -> list[list[dict]]:
             # get_textbox por celda conserva los espacios mejor que t.extract()
             rows = [[page.get_textbox(cell) if cell else "" for cell in row.cells] for row in t.rows]
             blocks.append({
-                "y0": t.bbox[1], "y1": t.bbox[3], "height": height,
+                "x0": t.bbox[0], "y0": t.bbox[1], "x1": t.bbox[2], "y1": t.bbox[3],
+                "width": width, "height": height,
                 "text": _table_markdown(rows), "size": 0, "bold": False, "kind": "table",
             })
+        if _is_figure_page(page, blocks):
+            for b in blocks:
+                if b["kind"] == "text" and not _in_margin(b):
+                    b["kind"] = "figure"  # se descarta: ver README, limitaciones
         pages.append(sorted(blocks, key=lambda b: b["y0"]))
     return pages
 
@@ -100,11 +142,7 @@ def _repeated_margin_text(pages: list[list[dict]]) -> set[str]:
         return set()
     counts = Counter()
     for blocks in pages:
-        seen = {
-            _signature(b["text"]) for b in blocks
-            if b["y1"] < b["height"] * MARGIN or b["y0"] > b["height"] * (1 - MARGIN)
-        }
-        counts.update(seen)
+        counts.update({_signature(b["text"]) for b in blocks if _in_margin(b)})
     return {sig for sig, n in counts.items() if n >= len(pages) / 2}
 
 
@@ -115,22 +153,42 @@ def parse_pdf(path: str) -> list[Paragraph]:
 
     text_sizes = [b["size"] for blocks in pages for b in blocks if b["kind"] == "text" for _ in range(len(b["text"]))]
     body_size = statistics.median(text_sizes) if text_sizes else 10
-    heading_sizes = sorted({b["size"] for blocks in pages for b in blocks if b["size"] >= body_size + 1.5}, reverse=True)
+    heading_sizes = sorted({b["size"] for blocks in pages for b in blocks
+                            if b["kind"] == "text" and b["size"] >= body_size + 1.5}, reverse=True)
 
-    paragraphs = []
+    paragraphs: list[Paragraph] = []
+    bullet = ""  # viñeta que quedó sola en su línea ("−−"): se pega al ítem que sigue
     for page_no, blocks in enumerate(pages, start=1):
         para = 0
         for b in blocks:
             text = b["text"]
-            in_margin = b["y1"] < b["height"] * MARGIN or b["y0"] > b["height"] * (1 - MARGIN)
-            if in_margin and (_signature(text) in repeated or text.strip().isdigit()):
+            if b["kind"] == "figure":
+                continue
+            if _in_margin(b) and (_signature(text) in repeated or text.strip().isdigit()):
                 continue  # encabezado, pie o número de página
+            if b["kind"] == "text" and not re.search(r"\w", text):
+                bullet = "– "
+                continue
+            if bullet and b["kind"] == "text":
+                text, bullet = bullet + text, ""
 
             kind, level = b["kind"], 0
-            if kind == "text" and b["size"] in heading_sizes:
+            if kind == "text" and (STRENGTH.match(text) or BULLET.match(text)):
+                pass  # la fuerza de la recomendación y los ítems de lista son contenido, aunque vayan en negrita
+            elif kind == "text" and b["size"] in heading_sizes:
                 kind, level = "heading", heading_sizes.index(b["size"]) + 1
             elif kind == "text" and b["bold"] and len(text) < 120 and not text.endswith("."):
                 kind, level = "heading", len(heading_sizes) + 1
+
+            # Párrafo que sigue al anterior: empieza en minúscula y el anterior quedó sin cerrar.
+            # Pasa al cambiar de página o cuando la negrita cambia a mitad de párrafo.
+            prev = paragraphs[-1] if paragraphs else None
+            if (kind == "text" and text[:1].islower() and prev and prev.kind == "text"
+                    and not TERMINAL.search(prev.text)):
+                prev.text = _join_lines([prev.text, text])
+                if prev.page != page_no:
+                    para += 1  # en esta página es un bloque visible: el siguiente párrafo es el 2
+                continue
 
             if kind != "heading":
                 para += 1  # los títulos no cuentan: "párrafo 2" es el segundo bloque de contenido

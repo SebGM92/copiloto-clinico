@@ -2,14 +2,12 @@
 import re
 from dataclasses import dataclass, field
 
-from .pdf_parser import Paragraph
+from .pdf_parser import STRENGTH, Paragraph
 
-# Líneas que califican a la recomendación anterior: nunca se separan de ella
-STRENGTH = re.compile(
-    r"^(recomendaci[oó]n (fuerte|condicional|d[eé]bil)|grado de recomendaci[oó]n|"
-    r"nivel de evidencia|certeza (de la|en la) evidencia|calidad de (la )?evidencia)",
-    re.IGNORECASE,
-)
+__all__ = ["STRENGTH", "Chunk", "chunk_paragraphs"]
+
+# "3.1 PRIMERA LÍNEA", "2. Métodos": un título numerado manda sobre uno sin número del mismo tamaño
+NUMBERED = re.compile(r"^\d+(\.\d+)*\.?\s")
 
 
 @dataclass
@@ -30,10 +28,16 @@ class Chunk:
         return self.paragraphs[-1].page
 
 
+def _heading_rank(p: Paragraph) -> float:
+    # Mismo tamaño de letra: "Recomendación 1" queda dentro de "3.1 PRIMERA LÍNEA", no la reemplaza
+    return p.level if NUMBERED.match(p.text) else p.level + 0.5
+
+
 def chunk_paragraphs(paragraphs: list[Paragraph], max_chars: int = 1500) -> list[Chunk]:
     chunks: list[Chunk] = []
-    path: list[tuple[int, str]] = []  # pila de títulos: [(nivel, texto)]
+    path: list[tuple[float, str]] = []  # pila de títulos: [(rango, texto)]
     current: list[Paragraph] = []
+    prev_heading = False
 
     def section() -> str:
         return " > ".join(title for _, title in path)
@@ -46,8 +50,16 @@ def chunk_paragraphs(paragraphs: list[Paragraph], max_chars: int = 1500) -> list
     for p in paragraphs:
         if p.kind == "heading":
             flush()
-            path[:] = [h for h in path if h[0] < p.level] + [(p.level, p.text)]
+            rank = _heading_rank(p)
+            if prev_heading and path and path[-1][0] == rank:
+                # Títulos seguidos del mismo nivel son uno solo partido en líneas:
+                # "Recomendación 1" + "En personas adultas mayores…?"
+                path[-1] = (rank, f"{path[-1][1]} {p.text}")
+            else:
+                path[:] = [h for h in path if h[0] < rank] + [(rank, p.text)]
+            prev_heading = True
             continue
+        prev_heading = False
         if p.kind == "table":
             flush()  # una tabla siempre va en su propio fragmento, con su sección
             chunks.append(Chunk(section=section(), paragraphs=[p]))
