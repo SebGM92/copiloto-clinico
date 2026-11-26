@@ -1,8 +1,8 @@
 """CLI de ingesta: python -m app.ingest.cli <carpeta_pdfs>"""
 import argparse
+from collections import Counter
 from pathlib import Path
 
-from app.ingest.chunker import chunk_text
 from app.ingest.pdf_parser import parse_pdf
 
 
@@ -12,10 +12,11 @@ def main() -> None:
     args = parser.parse_args()
 
     for pdf in sorted(args.folder.glob("*.pdf")):
-        pages = parse_pdf(pdf)
-        n = sum(len(chunk_text(text)) for _, text in pages)
-        print(f"{pdf.name}: {len(pages)} páginas, {n} chunks")
-        # TODO: generar embeddings y guardar en la base de datos
+        paragraphs = parse_pdf(str(pdf))
+        kinds = Counter(p.kind for p in paragraphs)
+        pages = len({p.page for p in paragraphs})
+        print(f"{pdf.name}: {pages} páginas, {dict(kinds)}")
+        # TODO: agrupar en fragmentos por sección, generar embeddings y guardar en la base
 
 
 if __name__ == "__main__":

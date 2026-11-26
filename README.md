@@ -16,3 +16,7 @@ uvicorn app.main:app --reload        # http://localhost:8000/docs
 cd frontend
 npm install && npm run dev           # http://localhost:3000
 ```
+
+## Limitaciones conocidas
+
+- **Flujogramas:** las guías suelen incluir flujogramas como imágenes; el parser solo extrae texto y tablas, así que su contenido se pierde. Normalmente esa información también aparece en el texto de la guía.
