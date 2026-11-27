@@ -3,7 +3,7 @@ from typing import TypedDict
 
 from langgraph.graph import END, StateGraph
 
-from app import acronyms, guard, llm, retrieval, verify
+from app import guard, llm, retrieval, verify
 
 
 class State(TypedDict, total=False):
@@ -21,7 +21,8 @@ def guard_node(state: State) -> State:
 
 
 def retrieve_node(state: State) -> State:
-    chunks = retrieval.search(acronyms.expand(state["query"]))
+    # La pregunta va tal cual: retrieval amplía las siglas solo para la búsqueda léxica
+    chunks = retrieval.search(state["query"])
     return {"sources": [c.content for c in chunks]}
 
 
