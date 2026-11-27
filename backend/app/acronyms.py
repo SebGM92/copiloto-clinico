@@ -22,6 +22,10 @@ ACRONYMS = {
     # Significados del glosario de la guía de Depresión (Anexo 1) o del propio texto.
     "ECV": "enfermedades cardiovasculares",
     "GLP": "péptido similar al glucagón",
+    # La guía DM2 escribe "Inhibidores de DPP4" y a veces "iDPP4"; para la búsqueda léxica
+    # "idpp4" y "dpp4" son lexemas distintos (evaluación: la pregunta dm2-04 se perdía en la híbrida)
+    "IDPP4": "inhibidores de DPP4",
+    "ISGLT2": "inhibidores de SGLT2",
     "ISRS": "inhibidores selectivos de la recaptación de serotonina",
     "ATC": "antidepresivos tricíclicos",
     "IMAO": "inhibidores de la monoaminooxidasa",

@@ -37,6 +37,29 @@ Decisiones:
 - **La columna `tsv` es generada.** PostgreSQL la recalcula sola al cambiar `section` o `content`, así que nunca queda desfasada del texto.
 - **HNSW con distancia coseno.** No necesita entrenarse con los datos, a diferencia de IVFFlat, y con unos miles de fragmentos responde en milisegundos.
 
+## Evaluación de la búsqueda
+
+`backend/eval/questions.json` tiene 20 preguntas (10 por guía) con las páginas donde está la respuesta. `python -m eval.retrieval_modes` (desde `backend/`) las corre con búsqueda solo semántica, solo léxica e híbrida, y cuenta en cuántas aparece una página correcta entre los 8 fragmentos que llegarían a Claude.
+
+| Búsqueda | Página correcta en top 8 | En top 20 pero no en top 8 |
+|---|---|---|
+| Solo semántica (bge-m3) | 20/20 (100 %) | 0 |
+| Solo léxica (tsvector, OR) | 18/20 (90 %) | 1 |
+| Híbrida (RRF), primera versión | 19/20 (95 %) | 1 |
+| Híbrida (RRF) + siglas `iDPP4`/`iSGLT2` | 20/20 (100 %) | 0 |
+
+Lo que muestran:
+
+- **La híbrida perdía una pregunta por una sigla.** En `dm2-04` ("¿iDPP4 o iSGLT2…?") la semántica ponía la página correcta primera, pero la léxica no la encontraba: la pregunta dice "iDPP4" y la guía "Inhibidores de DPP4", lexemas distintos. Con RRF, un fragmento que aparece en una sola lista suma 1/61 y lo superan fragmentos mediocres que aparecen en las dos: quedaba en el puesto 18. Agregar `IDPP4` e `ISGLT2` a las siglas la subió al puesto 1, sin cambiar las demás.
+- **La léxica sola falla donde la pregunta no usa las palabras de la guía** (`dm2-10`, `dep-08`).
+- **Reranking: por ahora no hace falta.** Ninguna respuesta queda entre los 20 primeros pero fuera de los 8.
+
+Advertencias sobre estos números:
+
+- **Las preguntas las redactó Claude** leyendo las guías, así que tienden a usar su vocabulario. Esto favorece a ambas búsquedas, sobre todo a la semántica, y hay que validarlas con un médico y sumar preguntas reales.
+- Con solo dos guías hay pocos distractores; con más guías la búsqueda léxica debería aportar más (dosis exactas, nombres de fármacos).
+- La Fase 8 debe repetir esto con más preguntas antes de decidir el reranking.
+
 ## Limitaciones conocidas
 
 - **Flujogramas:** si son imágenes, su contenido se pierde. Si están dibujados con texto vectorial (como el algoritmo de la guía de DM2), la página se detecta y se descarta, porque sus etiquetas sueltas ("Sí", "No", "¿Cumple meta?") solo meten ruido. En ambos casos, la información suele estar también en el texto de la guía.

@@ -27,3 +27,9 @@ def test_common_spanish_words_do_not_expand():
     # "su" no está en la lista a propósito: si estuviera, "ajustar su dosis" sumaría "sulfonilureas"
     assert "SU" not in ACRONYMS
     assert expand("ajustar su dosis según la función renal") == "ajustar su dosis según la función renal"
+
+
+def test_inhibitor_prefixed_acronyms_reach_the_guide_wording():
+    # La guía escribe "Inhibidores de DPP4"; sin esto, "iDPP4" no coincide con ningún lexema
+    out = expand("¿iDPP4 o iSGLT2 en monoterapia?")
+    assert "inhibidores de DPP4" in out and "inhibidores de SGLT2" in out
