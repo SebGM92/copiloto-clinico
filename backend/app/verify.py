@@ -6,7 +6,9 @@ from .llm import AnswerBlock
 from .retrieval import RetrievedChunk
 
 ABSTENTION = "Las guías cargadas no responden esta pregunta."
-NUMBER = re.compile(r"\d+(?:[.,]\d+)?")
+# Un número pegado a una letra o unido con guion es parte de un nombre, no un dato clínico:
+# "iDPP4", "DM2", "HbA1c", "SGLT2", "GLP-1", "PHQ-9", "CIE-10". Las dosis y metas siguen contando.
+NUMBER = re.compile(r"(?<![\d.,])(?<![^\W\d_])(?<![^\W\d_]-)\d+(?:[.,]\d+)?")
 LIST_MARKER = re.compile(r"^\s*\d+[.)]\s", re.MULTILINE)
 
 

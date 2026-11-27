@@ -75,6 +75,8 @@ En clínica casi todo error grave es un número. La regla tiene falsos positivos
 
 **Ajuste medido:** con la regla tal cual, las 3 respuestas correctas de la prueba se retiraron. Claude abre con frases como "La guía GES de Diabetes Mellitus tipo 2 (2017) indica:" o "(Anexo 6)", sin cita y con números que no son datos clínicos. Ahora se ignoran el año de la guía entregada, las frases numéricas de su título junto a su palabra ("tipo 2", "15 años", no un "2" suelto) y las referencias a partes de la guía ("Anexo 6", "Tabla Nº 1", "Recomendación 3"). Después del ajuste, las 3 quedaron `verified` y la pregunta sin cobertura `abstained`. Una dosis sin cita o mal copiada se sigue retirando.
 
+**Segundo ajuste, al probar el grafo completo:** una respuesta correcta sobre segunda línea en DM2 se retiró porque "metformina con iDPP4" contaba el 4 como dato. Ahora no cuentan los números pegados a una letra o unidos con guion, que son parte de un nombre: iDPP4, DM2, SGLT2, HbA1c, GLP-1, PHQ-9, CIE-10. Con este cambio, la respuesta quedó `verified` y sus 10 citas aparecen en las páginas indicadas del PDF (p29-p31). Las dosis y metas siguen contando ("50 mg", "<8%", "IMC >30").
+
 ## Limitaciones conocidas
 
 - **Flujogramas:** si son imágenes, su contenido se pierde. Si están dibujados con texto vectorial (como el algoritmo de la guía de DM2), la página se detecta y se descarta, porque sus etiquetas sueltas ("Sí", "No", "¿Cumple meta?") solo meten ruido. En ambos casos, la información suele estar también en el texto de la guía.

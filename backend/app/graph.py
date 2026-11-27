@@ -1,50 +1,107 @@
-"""Orquestación del flujo con LangGraph: guard -> retrieve -> generate -> verify."""
+"""Flujo del copiloto en LangGraph: guard -> retrieve -> evidencia -> generate -> verify."""
+import asyncio
+from dataclasses import asdict
 from typing import TypedDict
 
-from langgraph.graph import END, StateGraph
+from anthropic import AsyncAnthropic
+from langgraph.config import get_stream_writer
+from langgraph.graph import END, START, StateGraph
+from psycopg_pool import AsyncConnectionPool
 
-from app import guard, llm, retrieval, verify
+from . import config
+from .embeddings import Embedder
+from .guard import find_patient_data
+from .llm import AnswerBlock, stream_answer
+from .retrieval import RetrievedChunk, hybrid_search
+from .verify import verify
 
 
 class State(TypedDict, total=False):
-    query: str
-    allowed: bool
-    reason: str
-    sources: list[str]
-    answer: str
-    grounded: bool
+    question: str
+    chunks: list[RetrievedChunk]
+    blocks: list[AnswerBlock]
+    stop_reason: str     # "end_turn" si la respuesta llegó completa
+    status: str          # blocked | no_evidence | verified | retracted | abstained
+    message: str
+    problems: list[str]
 
 
-def guard_node(state: State) -> State:
-    r = guard.check(state["query"])
-    return {"allowed": r.allowed, "reason": r.reason}
+def build_graph(pool: AsyncConnectionPool, embedder: Embedder, client: AsyncAnthropic,
+                model: str = config.ANTHROPIC_MODEL, top_k: int = config.TOP_K,
+                min_similarity: float = config.MIN_SIMILARITY):
 
+    async def guard(state: State) -> State:
+        reason = find_patient_data(state["question"])
+        if reason:
+            return {"status": "blocked", "message": reason}
+        return {}
 
-def retrieve_node(state: State) -> State:
-    # La pregunta va tal cual: retrieval amplía las siglas solo para la búsqueda léxica
-    chunks = retrieval.search(state["query"])
-    return {"sources": [c.content for c in chunks]}
+    async def retrieve(state: State) -> State:
+        write = get_stream_writer()
+        write({"event": "status", "data": {"stage": "buscando"}})
+        vector = (await asyncio.to_thread(embedder.embed, [state["question"]]))[0]
+        async with pool.connection() as conn:
+            chunks = await hybrid_search(conn, state["question"], vector, k=top_k)
+        write({"event": "sources", "data": [
+            {"n": i + 1, "title": c.title, "year": c.year, "section": c.section,
+             "page_start": c.page_start, "page_end": c.page_end, "url": f"{c.source_url}#page={c.page_start}"}
+            for i, c in enumerate(chunks)
+        ]})
+        return {"chunks": chunks}
 
+    async def check_evidence(state: State) -> State:
+        chunks = state["chunks"]
+        best = max((c.similarity or 0 for c in chunks), default=0)
+        has_keyword_hit = any(c.keyword_rank is not None for c in chunks)
+        if not chunks or (best < min_similarity and not has_keyword_hit):
+            return {"status": "no_evidence",
+                    "message": "No encontré evidencia suficiente en las guías cargadas para responder."}
+        return {}
 
-def generate_node(state: State) -> State:
-    return {"answer": llm.generate(state["query"], state.get("sources", []))}
+    async def generate(state: State) -> State:
+        write = get_stream_writer()
+        write({"event": "status", "data": {"stage": "generando"}})
+        blocks: list[AnswerBlock] = []
+        stop_reason = None
+        async for kind, payload in stream_answer(client, model, state["question"], state["chunks"]):
+            if kind == "text":
+                write({"event": "token", "data": {"text": payload, "block": len(blocks)}})
+            elif kind == "citation":
+                write({"event": "citation", "data": {"block": len(blocks), "n": payload.search_result_index + 1}})
+            elif kind == "block_end":
+                blocks.append(payload)
+            elif kind == "stop":
+                stop_reason = payload
+        return {"blocks": blocks, "stop_reason": stop_reason}
 
+    async def check_answer(state: State) -> State:
+        write = get_stream_writer()
+        write({"event": "status", "data": {"stage": "verificando"}})
+        result = verify(state["blocks"], state["chunks"])
+        status, problems = result.status, list(result.problems)
+        if state.get("stop_reason") != "end_turn":
+            # Cortada por max_tokens o rechazada: aunque lo escrito esté bien citado, está incompleta
+            status = "retracted"
+            problems.append(f"La respuesta quedó incompleta (stop_reason: {state.get('stop_reason')})")
+        write({"event": "references", "data": [asdict(r) for r in result.refs]})
+        return {"status": status, "problems": problems}
 
-def verify_node(state: State) -> State:
-    r = verify.verify(state["answer"], state.get("sources", []))
-    return {"grounded": r.grounded}
+    def after_guard(state: State) -> str:
+        return END if state.get("status") == "blocked" else "retrieve"
 
+    def after_evidence(state: State) -> str:
+        return END if state.get("status") == "no_evidence" else "generate"
 
-def build_graph():
-    g = StateGraph(State)
-    g.add_node("guard", guard_node)
-    g.add_node("retrieve", retrieve_node)
-    g.add_node("generate", generate_node)
-    g.add_node("verify", verify_node)
-
-    g.set_entry_point("guard")
-    g.add_conditional_edges("guard", lambda s: "retrieve" if s["allowed"] else END)
-    g.add_edge("retrieve", "generate")
-    g.add_edge("generate", "verify")
-    g.add_edge("verify", END)
-    return g.compile()
+    graph = StateGraph(State)
+    graph.add_node("guard", guard)
+    graph.add_node("retrieve", retrieve)
+    graph.add_node("check_evidence", check_evidence)
+    graph.add_node("generate", generate)
+    graph.add_node("verify", check_answer)
+    graph.add_edge(START, "guard")
+    graph.add_conditional_edges("guard", after_guard, ["retrieve", END])
+    graph.add_edge("retrieve", "check_evidence")
+    graph.add_conditional_edges("check_evidence", after_evidence, ["generate", END])
+    graph.add_edge("generate", "verify")
+    graph.add_edge("verify", END)
+    return graph.compile()

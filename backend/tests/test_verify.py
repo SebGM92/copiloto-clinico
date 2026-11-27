@@ -105,3 +105,16 @@ def test_year_only_counts_as_whole_number():
 def test_wrong_dose_is_still_retracted_with_metadata_allowances():
     v = verify([AnswerBlock("Según la guía tipo 2 (2017), losartán 100 mg.", [cite()])], [DM2])
     assert v.status == "retracted" and "100" in v.problems[0]
+
+
+def test_digits_inside_drug_and_scale_names_are_not_clinical_data():
+    assert numbers("metformina con iDPP4 o iSGLT2 en DM2, meta de HbA1c") == set()
+    assert numbers("análogos GLP-1, escala PHQ-9, criterios CIE-10") == set()
+    assert numbers("HbA1c <8%, 50 mg, IMC >30, entre 7-7,5 %") == {"8", "50", "30", "7", "7.5"}
+    assert numbers("Glicemia >300 mg/dL") == {"300"}
+
+
+def test_answer_naming_idpp4_without_citation_is_verified():
+    blocks = [AnswerBlock("La guía GES de Diabetes Mellitus tipo 2 (2017) recomienda metformina con iDPP4."),
+              AnswerBlock("Losartán 50 mg al día.", [cite()])]
+    assert verify(blocks, [DM2]).status == "verified"
