@@ -60,6 +60,21 @@ Advertencias sobre estos números:
 - Con solo dos guías hay pocos distractores; con más guías la búsqueda léxica debería aportar más (dosis exactas, nombres de fármacos).
 - La Fase 8 debe repetir esto con más preguntas antes de decidir el reranking.
 
+## Verificación de respuestas
+
+`backend/app/verify.py` revisa cada respuesta de Claude antes de mostrarla, con reglas deterministas:
+
+| Regla | Qué atrapa | Estado |
+|---|---|---|
+| Sin ninguna cita, o con la frase de abstención | El modelo no encontró sustento | `abstained` |
+| Bloque con números y sin cita | Una dosis o meta inventada, o traída de memoria | `retracted` |
+| Número que no aparece en el texto citado | Una dosis mal copiada ("100 mg" citando "50 mg") | `retracted` |
+| Cita a un índice inexistente o con texto distinto | Un error de integración | `retracted` |
+
+En clínica casi todo error grave es un número. La regla tiene falsos positivos conocidos ("cada 3 meses" citando "trimestral"): preferimos retirar una respuesta correcta a dejar pasar una dosis inventada.
+
+**Ajuste medido:** con la regla tal cual, las 3 respuestas correctas de la prueba se retiraron. Claude abre con frases como "La guía GES de Diabetes Mellitus tipo 2 (2017) indica:" o "(Anexo 6)", sin cita y con números que no son datos clínicos. Ahora se ignoran el año de la guía entregada, las frases numéricas de su título junto a su palabra ("tipo 2", "15 años", no un "2" suelto) y las referencias a partes de la guía ("Anexo 6", "Tabla Nº 1", "Recomendación 3"). Después del ajuste, las 3 quedaron `verified` y la pregunta sin cobertura `abstained`. Una dosis sin cita o mal copiada se sigue retirando.
+
 ## Limitaciones conocidas
 
 - **Flujogramas:** si son imágenes, su contenido se pierde. Si están dibujados con texto vectorial (como el algoritmo de la guía de DM2), la página se detecta y se descarta, porque sus etiquetas sueltas ("Sí", "No", "¿Cumple meta?") solo meten ruido. En ambos casos, la información suele estar también en el texto de la guía.
