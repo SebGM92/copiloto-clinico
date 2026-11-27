@@ -81,6 +81,24 @@ En clínica casi todo error grave es un número. La regla tiene falsos positivos
 
 `POST /api/chat` recorre el grafo y reenvía cada evento como Server-Sent Events (`status`, `sources`, `token`, `citation`, `references` y, al final, `final` con el veredicto). `GET /api/documents` lista las guías cargadas. Cada pregunta queda en la tabla `queries` con su estado, los fragmentos usados y la latencia; si la pregunta se bloqueó por contener un RUN, se guarda como `[bloqueada: contenía datos de paciente]`, nunca el texto original.
 
+| Evento | Cuándo | Para qué |
+|---|---|---|
+| `status` | Al empezar cada etapa | Mostrar "Buscando…", "Generando…", "Verificando…" |
+| `sources` | Tras la búsqueda | Listar los fragmentos que verá el modelo |
+| `token` | Durante la generación | El texto del bloque `block` |
+| `citation` | Durante la generación | El marcador [n] de ese bloque |
+| `references` | Tras verificar | Página, párrafo y cita textual de cada fuente |
+| `final` | Siempre, al cerrar | El veredicto: `verified`, `retracted`, `abstained`, `no_evidence` o `blocked` |
+
+Probarlo sin frontend (con `-N` para que curl no acumule la respuesta):
+
+```bash
+curl -N -X POST localhost:8000/api/chat -H 'Content-Type: application/json' \
+  -d '{"question": "¿Cuál es la meta de HbA1c en DM2?"}'
+```
+
+**Tests sin gastar tokens:** `tests/fake_anthropic.py` es un servidor falso de la API de Anthropic que se conecta al SDK oficial con `httpx2.MockTransport`. Responde en el mismo formato SSE que la API real y arma cada cita ubicando el párrafo citado dentro de los `search_result` recibidos, como lo hace Claude. `tests/test_api_e2e.py` prueba así el SDK, el parser de eventos, la verificación, el grafo y la API, sobre una guía ficticia ingestada en la base. Cubre respuesta correcta, dosis cambiada, número sin cita, abstención y respuesta cortada, y revisa que todos los `search_result` lleven las citas activadas.
+
 ### Decisión: la respuesta se muestra solo después del veredicto
 
 El backend emite el texto en vivo, pero el frontend no lo muestra hasta recibir `final`. Mientras tanto muestra la etapa en curso ("buscando", "generando", "verificando").
