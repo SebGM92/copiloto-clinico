@@ -23,10 +23,17 @@
 
 ## Evaluador (`run_eval.py`)
 
-- `python -m eval.run_eval retrieval`: gratis; `hit_rate`, `mrr` y las similitudes para calibrar `MIN_SIMILARITY`.
-- `python -m eval.run_eval full [--judge]`: el grafo completo con Claude; `--judge` agrega `faithfulness` con Claude Haiku 5.5.
-- `--demo --golden eval/golden_ficticia.jsonl`: prueba el evaluador sin costo contra el servidor de demostración.
-- Resultados en `results/`; métricas y lectura en el README principal.
+- `python -m eval.run_eval eval/golden.jsonl --mode retrieval`: gratis; `hit_rate`, `mrr` y las similitudes para calibrar `MIN_SIMILARITY`.
+- `python -m eval.run_eval eval/golden.jsonl --mode full [--judge]`: el grafo completo con Claude; `--judge` agrega `faithfulness` con Claude Haiku 5.5.
+- `--min-hit 0.85 --max-false-answer 0`: termina con código 1 si no cumple (control de CI).
+- `--demo` con `eval/golden_ficticia.jsonl`: de punta a punta sin costo (Claude y juez simulados).
+- Detalle por pregunta en `report.json`; copia con fecha en `results/`.
+
+## Acuerdo del juez (`judge_agreement.py`)
+
+1. `python -m eval.judge_agreement export eval/results/<corrida full --judge>.json --n 20` escribe `judge_labels.jsonl` con 20 pares afirmación-cita, **sin** el veredicto del juez: todos los que rechazó (hasta la mitad) y el resto al azar.
+2. Etiquetar a mano cada par: `"human": true` si la cita respalda TODA la afirmación, incluidos números y unidades; `false` si no.
+3. `python -m eval.judge_agreement score` mide el acuerdo y lista los desacuerdos.
 
 ## Otros archivos
 

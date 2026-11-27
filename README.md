@@ -142,10 +142,17 @@ Set dorado en `backend/eval/golden.jsonl`: 51 preguntas, 41 con respuesta en las
 
 ```bash
 cd backend && set -a && source .env && set +a
-python -m eval.run_eval retrieval          # gratis: ¿llega la página correcta al modelo?
-python -m eval.run_eval full --judge       # grafo completo + juez Claude Haiku 5.5 (~$1,25)
-python -m eval.run_eval full --demo --golden eval/golden_ficticia.jsonl   # prueba el evaluador sin costo
+python -m eval.run_eval eval/golden.jsonl --mode retrieval          # gratis: ¿llega la página correcta?
+python -m eval.run_eval eval/golden.jsonl --mode full --judge       # grafo + juez Claude Haiku 5.5 (~$1,25)
+
+# Control de CI: termina con código 1 si no cumple
+python -m eval.run_eval eval/golden.jsonl --mode retrieval --min-hit 0.85
+python -m eval.run_eval eval/golden_ficticia.jsonl --mode full --demo --judge --min-hit 0.85 --max-false-answer 0
 ```
+
+Imprime un resumen y guarda el detalle por pregunta en `eval/report.json` (y una copia con fecha en `eval/results/`). Con `--demo` corre de punta a punta sin costo: guía ficticia, Claude simulado y juez simulado; las tres preguntas con respuesta salen `verified`, sarampión `no_evidence` y HTA en el embarazo `abstained`, con `false_answer_rate` 0 y `must_contain` y `citation_precision` 1. `tests/test_run_eval_demo.py` lo comprueba en cada corrida de tests.
+
+**El juez:** Claude Haiku 5.5 recibe cada afirmación citada, su cita y la respuesta completa como contexto, y devuelve una salida estructurada (`supported: bool`). No se usa un "SI/NO" con `max_tokens=5`: Haiku 5.5 razona antes de responder y ese razonamiento cuenta en `max_tokens`, así que con 5 tokens la respuesta podría llegar vacía. **El juez también se equivoca:** `python -m eval.judge_agreement export eval/results/<corrida>.json --n 20` saca 20 pares afirmación-cita sin el veredicto del juez; se etiquetan a mano (`"human": true/false`) y `python -m eval.judge_agreement score` mide el acuerdo, que se reporta junto a `faithfulness`.
 
 ### Resultados
 
@@ -158,10 +165,22 @@ python -m eval.run_eval full --demo --golden eval/golden_ficticia.jsonl   # prue
 | `retracted` | Respuestas retiradas por la verificación | baja | 0,137 (7 de 51) |
 | `must_contain` | Las respuestas verificadas traen los datos clave | ≥ 0,9 | **1,000** ✓ |
 | `citation_precision` | Las citas apuntan a las páginas esperadas | ≥ 0,8 | 0,624 ✗ |
-| `faithfulness` | Juez Haiku 5.5: la cita respalda cada afirmación | ≥ 0,95 | **0,968** ✓ |
+| `faithfulness` | Juez Haiku 5.5: la cita respalda cada afirmación | ≥ 0,95 | **0,968** ✓ (acuerdo juez-persona: pendiente) |
 | `latency_p50_s` / `p95_s` | Tiempo de respuesta | — | 3,6 s / 6,1 s |
 
 Resultados completos (con cada respuesta) en `backend/eval/results/`.
+
+### Experimentos
+
+Una sola cosa por vez y volver a medir. Todas con el set dorado, Claude Sonnet 5.5 y `TOP_K` 8.
+
+| Fecha | Cambio | hit_rate | answered_verified | false_answer_rate | retracted | must_contain | citation_precision | faithfulness | p50 |
+|---|---|---|---|---|---|---|---|---|---|
+| 2026-11-27 | Línea base: evidencia con similitud ≥ 0,45 **o** una palabra en común | 0,975 | — | — | 5 de 33 | — | — | — | — |
+| 2026-11-27 | Evidencia solo por similitud ≥ 0,55; juez con la respuesta como contexto | 0,975 | 0,675 | 0,100 (error del set) | 0,220 | 1,000 | 0,652 | 0,977 | 3,5 s |
+| 2026-11-27 | Set corregido (`dep-21`, trampa de aspirina) y grados citados aceptados en `verify` | 0,976 | **0,780** | **0** | 0,137 | 1,000 | 0,624 | 0,968 | 3,6 s |
+
+La línea base se cortó en la pregunta 34 de 50 por un error de red. La búsqueda tiene su propio historial en la sección "Evaluación de la búsqueda" (Fase 4): semántica 20/20, léxica 18/20, híbrida 19/20 → 20/20 al agregar las siglas `iDPP4` e `iSGLT2`.
 
 ### Qué cambió al medir
 

@@ -64,6 +64,9 @@ class DemoAnthropic(FakeAnthropic):
         q = question.lower()
         if "embarazo" in q:
             return [(ABSTENTION, None)]
+        if "cada cuánto" in q or "control" in q:
+            return [("Se recomienda controlar la presión arterial cada tres meses durante el primer año.",
+                     "Se recomienda controlar la presión arterial")]
         if "amlodipino" in q:
             return [("Según la tabla de dosis de la guía, ", None),
                     ("la dosis máxima de amlodipino es 10 mg.", "| Amlodipino |")]

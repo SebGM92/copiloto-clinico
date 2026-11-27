@@ -1,15 +1,16 @@
 """Evaluación del copiloto con el set dorado.
 
-Modos:
-    python -m eval.run_eval retrieval            # gratis: ¿llega la página correcta al modelo?
-    python -m eval.run_eval full                 # grafo completo con Claude (gasta tokens)
-    python -m eval.run_eval full --judge         # + juez Claude Haiku 5.5 para faithfulness
+Uso (desde backend/, con el .env cargado):
+    python -m eval.run_eval eval/golden.jsonl --mode retrieval      # gratis: ¿llega la página correcta?
+    python -m eval.run_eval eval/golden.jsonl --mode full --judge   # grafo completo + juez Haiku 5.5
 Opciones:
-    --golden RUTA   set dorado (por defecto eval/golden.jsonl)
-    --limit N       solo los primeros N casos
-    --demo          base rag_demo, embedder de hashing y Claude simulado: prueba el evaluador sin costo
-                    (usar con --golden eval/golden_ficticia.jsonl)
-Los resultados quedan en eval/results/<modo>-<fecha>.json.
+    --limit N                 solo los primeros N casos
+    --min-hit 0.85            termina con código 1 si hit_rate queda bajo el mínimo (control de CI)
+    --max-false-answer 0      termina con código 1 si false_answer_rate lo supera
+    --demo                    base rag_demo, embedder de hashing, Claude y juez simulados: sin costo
+                              (python -m eval.run_eval eval/golden_ficticia.jsonl --mode full --demo --judge)
+    --report RUTA             dónde guardar el detalle (por defecto eval/report.json)
+El detalle por pregunta queda en eval/report.json y una copia con fecha en eval/results/.
 """
 import sys
 
@@ -104,6 +105,8 @@ async def evaluate_full(cases: list[dict], run, judge=None, on_row=None) -> dict
         row = {"id": case["id"], "answerable": case["answerable"], "status": state.get("status"), "latency": latency}
 
         if case["answerable"]:
+            if case.get("doc") and case.get("pages"):
+                row["hit"] = any(is_hit(ch, case) for ch in state.get("chunks", []))
             row["contains"] = all(s.lower() in answer.lower() for s in case.get("must_contain", []))
             cited_pages = [
                 p["page"]
@@ -115,8 +118,13 @@ async def evaluate_full(cases: list[dict], run, judge=None, on_row=None) -> dict
 
         if judge and row["status"] == "verified":
             # Cada bloque es a veces un fragmento ("<8 %"): el juez recibe la respuesta completa como contexto
-            verdicts = [await judge(b.text, " ".join(c.cited_text for c in b.citations), answer)
-                        for b in state["blocks"] if b.citations]
+            row["judged"] = []
+            for b in state["blocks"]:
+                if b.citations:
+                    quote = " ".join(c.cited_text for c in b.citations)
+                    verdict = await judge(b.text, quote, answer)
+                    row["judged"].append({"claim": b.text, "quote": quote, "context": answer, "judge": verdict})
+            verdicts = [j["judge"] for j in row["judged"]]
             row["faithfulness"] = sum(verdicts) / len(verdicts) if verdicts else None
         row["problems"] = state.get("problems", [])
         row["answer"] = answer
@@ -134,6 +142,7 @@ async def evaluate_full(cases: list[dict], run, judge=None, on_row=None) -> dict
         return statistics.mean(values) if values else None
 
     return {
+        "hit_rate": mean_of_bool([r["hit"] for r in answerable if "hit" in r]),
         "answered_verified": mean_of_bool([r["status"] == "verified" for r in answerable]),
         "retracted": mean_of_bool([r["status"] == "retracted" for r in rows]),
         "errors": sum(r["status"] == "error" for r in rows),
@@ -181,6 +190,15 @@ def make_judge(client: AsyncAnthropic):
     return judge
 
 
+def make_fake_judge():
+    """Juez simulado para --demo: respaldada si todos los números de la afirmación están en la cita."""
+    from app.verify import numbers
+
+    async def judge(claim: str, quote: str, context: str = "") -> bool:
+        return numbers(claim) <= numbers(quote)
+    return judge
+
+
 def print_summary(metrics: dict) -> None:
     print("\n| Métrica | Valor | Meta |\n|---|---|---|")
     for key, value in metrics.items():
@@ -197,11 +215,14 @@ def print_summary(metrics: dict) -> None:
 
 async def main() -> None:
     parser = argparse.ArgumentParser(description="Evaluación con el set dorado")
-    parser.add_argument("mode", choices=["retrieval", "full"])
-    parser.add_argument("--golden", type=Path, default=EVAL_DIR / "golden.jsonl")
+    parser.add_argument("golden", nargs="?", type=Path, default=EVAL_DIR / "golden.jsonl")
+    parser.add_argument("--mode", choices=["retrieval", "full"], default="retrieval")
     parser.add_argument("--limit", type=int)
     parser.add_argument("--judge", action="store_true")
     parser.add_argument("--demo", action="store_true")
+    parser.add_argument("--min-hit", type=float)
+    parser.add_argument("--max-false-answer", type=float)
+    parser.add_argument("--report", type=Path, default=EVAL_DIR / "report.json")
     args = parser.parse_args()
 
     if args.demo:
@@ -220,8 +241,12 @@ async def main() -> None:
 
     def save(metrics_or_rows):
         payload = metrics_or_rows if isinstance(metrics_or_rows, dict) else {"partial_rows": metrics_or_rows}
-        out.write_text(json.dumps({"golden": args.golden.name, "model": config.ANTHROPIC_MODEL, "metrics": payload},
-                                  ensure_ascii=False, indent=2, default=str))
+        text = json.dumps({"golden": args.golden.name, "mode": args.mode, "model": config.ANTHROPIC_MODEL,
+                           "metrics": payload}, ensure_ascii=False, indent=2, default=str)
+        args.report.parent.mkdir(parents=True, exist_ok=True)
+        args.report.write_text(text)
+        if not args.demo:
+            out.write_text(text)  # historial con fecha
     print(f"{len(cases)} casos de {args.golden.name} · modo {args.mode}{' · demo' if args.demo else ''}")
     async with AsyncConnectionPool(config.DATABASE_URL, open=False) as pool:
         if args.mode == "retrieval":
@@ -233,7 +258,7 @@ async def main() -> None:
         else:
             min_similarity = 0.3 if args.demo else config.MIN_SIMILARITY  # hashing da similitudes más bajas
             graph = build_graph(pool, embedder, client, min_similarity=min_similarity)
-            judge = make_judge(AsyncAnthropic()) if args.judge else None
+            judge = (make_fake_judge() if args.demo else make_judge(AsyncAnthropic())) if args.judge else None
             metrics = await evaluate_full(cases, lambda q: graph.ainvoke({"question": q}), judge, on_row=save)
 
     print_summary(metrics)
@@ -241,7 +266,17 @@ async def main() -> None:
         print("\nMejor similitud con respuesta:", metrics["best_similarity_answerable"])
         print("Mejor similitud sin respuesta:", metrics["best_similarity_unanswerable"])
     save(metrics)
-    print(f"\nResultados en {out.relative_to(EVAL_DIR.parent)}")
+    print(f"\nDetalle en {args.report}")
+
+    failures = []
+    if args.min_hit is not None and (metrics.get("hit_rate") or 0) < args.min_hit:
+        failures.append(f"hit_rate {metrics.get('hit_rate')} < {args.min_hit}")
+    if args.max_false_answer is not None and args.mode == "full" \
+            and (metrics.get("false_answer_rate") or 0) > args.max_false_answer:
+        failures.append(f"false_answer_rate {metrics['false_answer_rate']} > {args.max_false_answer}")
+    if failures:
+        print("NO CUMPLE: " + "; ".join(failures))
+        sys.exit(1)
 
 
 if __name__ == "__main__":

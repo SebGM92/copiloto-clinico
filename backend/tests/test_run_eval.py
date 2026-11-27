@@ -48,3 +48,26 @@ def test_metrics_including_false_answers():
     assert m["answered_verified"] == 0.5 and m["false_answer_rate"] == 0.5
     assert m["retracted"] == 0.25 and m["must_contain"] == 1.0 and m["citation_precision"] == 1.0
     assert saved == [1, 2, 3, 4]  # se guarda después de cada caso
+
+
+def test_judge_agreement_export_hides_verdict_and_scores(tmp_path, monkeypatch):
+    import json
+
+    import eval.judge_agreement as ja
+
+    results = tmp_path / "results"
+    results.mkdir()
+    judged = [{"claim": f"c{i}", "quote": f"q{i}", "context": "", "judge": i % 3 != 0} for i in range(9)]
+    (results / "full-x.json").write_text(json.dumps({"metrics": {"rows": [{"id": "a", "judged": judged}]}}))
+    monkeypatch.setattr(ja, "EVAL_DIR", tmp_path)
+    monkeypatch.setattr(ja, "LABELS", tmp_path / "judge_labels.jsonl")
+
+    sample = ja.export(results / "full-x.json", n=6)
+    assert len(sample) == 6 and sum(not p["judge"] for p in sample) == 3  # todos los rechazados, hasta la mitad
+    lines = (tmp_path / "judge_labels.jsonl").read_text().splitlines()
+    assert all("judge" not in json.loads(line) for line in lines[1:])  # quien etiqueta no ve al juez
+
+    labeled = [json.loads(lines[0])] + [{**json.loads(line), "human": True} for line in lines[1:]]
+    (tmp_path / "judge_labels.jsonl").write_text("\n".join(json.dumps(x) for x in labeled))
+    r = ja.score()
+    assert r["labeled"] == 6 and r["agreement"] == 0.5  # la persona aceptó todo; el juez rechazó 3

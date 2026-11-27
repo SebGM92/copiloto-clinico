@@ -9,3 +9,4 @@ backend/data/
 backend/guias/
 .DS_Store
 backend/eval/results/*-demo-*.json
+backend/eval/report.json
