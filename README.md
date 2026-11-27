@@ -12,7 +12,7 @@ cp .env.example .env
 pip install -r requirements-dev.txt
 set -a && source .env && set +a
 python -m scripts.download_guides    # descarga las guías de corpus.json a guias/ y las ingesta
-uvicorn app.main:app --reload        # http://localhost:8000/docs
+uvicorn app.main:app --reload        # API en http://localhost:8000 (POST /api/chat, GET /api/documents)
 
 # Frontend
 cd frontend
@@ -76,6 +76,26 @@ En clínica casi todo error grave es un número. La regla tiene falsos positivos
 **Ajuste medido:** con la regla tal cual, las 3 respuestas correctas de la prueba se retiraron. Claude abre con frases como "La guía GES de Diabetes Mellitus tipo 2 (2017) indica:" o "(Anexo 6)", sin cita y con números que no son datos clínicos. Ahora se ignoran el año de la guía entregada, las frases numéricas de su título junto a su palabra ("tipo 2", "15 años", no un "2" suelto) y las referencias a partes de la guía ("Anexo 6", "Tabla Nº 1", "Recomendación 3"). Después del ajuste, las 3 quedaron `verified` y la pregunta sin cobertura `abstained`. Una dosis sin cita o mal copiada se sigue retirando.
 
 **Segundo ajuste, al probar el grafo completo:** una respuesta correcta sobre segunda línea en DM2 se retiró porque "metformina con iDPP4" contaba el 4 como dato. Ahora no cuentan los números pegados a una letra o unidos con guion, que son parte de un nombre: iDPP4, DM2, SGLT2, HbA1c, GLP-1, PHQ-9, CIE-10. Con este cambio, la respuesta quedó `verified` y sus 10 citas aparecen en las páginas indicadas del PDF (p29-p31). Las dosis y metas siguen contando ("50 mg", "<8%", "IMC >30").
+
+## API con streaming
+
+`POST /api/chat` recorre el grafo y reenvía cada evento como Server-Sent Events (`status`, `sources`, `token`, `citation`, `references` y, al final, `final` con el veredicto). `GET /api/documents` lista las guías cargadas. Cada pregunta queda en la tabla `queries` con su estado, los fragmentos usados y la latencia; si la pregunta se bloqueó por contener un RUN, se guarda como `[bloqueada: contenía datos de paciente]`, nunca el texto original.
+
+### Decisión: la respuesta se muestra solo después del veredicto
+
+El backend emite el texto en vivo, pero el frontend no lo muestra hasta recibir `final`. Mientras tanto muestra la etapa en curso ("buscando", "generando", "verificando").
+
+| Opción | A favor | En contra |
+|---|---|---|
+| Texto en vivo en gris, "sin verificar", y retirarlo si falla | Se siente rápido: el primer texto llega en menos de 1 s | Un médico puede leer y actuar antes del veredicto |
+| **Generar completo, verificar y recién mostrar** (elegida) | Nunca se ve una respuesta que después se retira | Espera de 3 a 6 s (medido con preguntas reales) |
+
+Por qué:
+
+- **En clínica, leer es actuar.** Un texto en gris con "sin verificar" no evita que alguien lea "50 mg" y lo use, sobre todo con prisa. Retirarlo después no deshace lo leído.
+- **El error que importa es justo el que la verificación atrapa.** Un número mal copiado o sin cita se ve igual de convincente que uno correcto mientras se genera.
+- **La espera es acotada y visible.** 3 a 6 s con etapas en pantalla es aceptable para una consulta de apoyo, no de urgencia vital.
+- **No cuesta nada en el backend.** El streaming sigue igual; si en el futuro se quiere la otra opción, solo cambia el frontend.
 
 ## Limitaciones conocidas
 
