@@ -1,0 +1,5 @@
+{"id": "fic-01", "question": "¿Con qué fármaco se inicia el tratamiento de la HTA no complicada?", "doc": "demo-hta-ficticia", "pages": [1], "must_contain": ["losartán", "50 mg"], "answerable": true}
+{"id": "fic-02", "question": "¿Cuál es la dosis máxima de amlodipino?", "doc": "demo-hta-ficticia", "pages": [2], "must_contain": ["10 mg"], "answerable": true}
+{"id": "fic-03", "question": "¿Cada cuánto se controla la presión arterial durante el primer año?", "doc": "demo-hta-ficticia", "pages": [3], "must_contain": ["tres meses"], "answerable": true}
+{"id": "fic-04", "question": "¿Qué tratamiento de la HTA se usa en el embarazo?", "answerable": false, "trap": true}
+{"id": "fic-05", "question": "¿Qué vacuna contra el sarampión se usa?", "answerable": false, "trap": false}
