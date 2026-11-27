@@ -8,3 +8,4 @@ node_modules/
 backend/data/
 backend/guias/
 .DS_Store
+backend/eval/results/*-demo-*.json

@@ -19,8 +19,12 @@ async def _configure(conn):
     await register_vector_async(conn)
 
 
-def create_app(embedder=None, client=None) -> FastAPI:
-    """Fábrica de la app: los tests inyectan un embedder y un cliente de Anthropic falsos."""
+def create_app(embedder=None, client=None, min_similarity: float | None = None) -> FastAPI:
+    """Fábrica de la app: los tests inyectan un embedder y un cliente de Anthropic falsos.
+
+    min_similarity: el umbral está calibrado para bge-m3; con el embedder de hashing
+    las similitudes son mucho más bajas y hay que pasar otro.
+    """
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
@@ -30,6 +34,7 @@ def create_app(embedder=None, client=None) -> FastAPI:
             app.state.pool,
             embedder or BgeM3Embedder(config.EMBEDDING_MODEL),
             client or AsyncAnthropic(),  # lee ANTHROPIC_API_KEY del entorno
+            min_similarity=config.MIN_SIMILARITY if min_similarity is None else min_similarity,
         )
         yield
         await app.state.pool.close()

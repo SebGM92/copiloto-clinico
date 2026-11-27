@@ -38,9 +38,10 @@
 {"id": "dep-18", "question": "¿Cuándo se considera tratamiento farmacológico profiláctico en depresión?", "doc": "ges-depresion-2013", "pages": [12, 42, 43], "must_contain": ["tres"], "answerable": true, "answer": "En personas con tres o más episodios depresivos"}
 {"id": "dep-19", "question": "¿Se recomienda tamizar depresión en personas con abuso de alcohol?", "doc": "ges-depresion-2013", "pages": [28], "must_contain": ["alcohol"], "answerable": true, "answer": "Sí, en consumo de sustancias y abuso de alcohol (2 B)"}
 {"id": "dep-20", "question": "¿Cuándo se puede usar terapia electroconvulsiva en depresión?", "doc": "ges-depresion-2013", "pages": [42, 12], "must_contain": ["electroconvulsiva"], "answerable": true, "answer": "En depresión grave resistente a tratamiento"}
+{"id": "dep-21", "question": "¿Qué dosis de litio se usa para potenciar un antidepresivo en una depresión refractaria?", "doc": "ges-depresion-2013", "pages": [44], "must_contain": ["0,8", "1,2"], "answerable": true, "answer": "La guía no da la dosis en mg; indica niveles plasmáticos de 0,8 a 1,2 mmol/l"}
 {"id": "fuera-01", "question": "¿Qué tratamiento se recomienda para la diabetes gestacional?", "answerable": false, "trap": true}
 {"id": "fuera-02", "question": "¿Qué dosis de insulina se usa en niños con diabetes tipo 1?", "answerable": false, "trap": true}
-{"id": "fuera-03", "question": "¿Qué dosis de litio se usa para potenciar un antidepresivo en una depresión refractaria?", "answerable": false, "trap": true}
+{"id": "fuera-03", "question": "¿Se recomienda aspirina para prevenir eventos cardiovasculares en personas con DM2?", "answerable": false, "trap": true}
 {"id": "fuera-04", "question": "¿Cuál es el tratamiento del trastorno bipolar en un episodio maníaco?", "answerable": false, "trap": true}
 {"id": "fuera-05", "question": "¿Cómo se trata un pie diabético infectado?", "answerable": false, "trap": true}
 {"id": "fuera-06", "question": "¿Qué vacuna contra el sarampión se aplica a los niños?", "answerable": false, "trap": false}

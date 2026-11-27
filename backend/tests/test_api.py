@@ -39,7 +39,7 @@ def api():
     except psycopg.OperationalError:
         pytest.skip("PostgreSQL no disponible")
     client = CitingClient()
-    with TestClient(create_app(embedder=HashingEmbedder(), client=client)) as http:
+    with TestClient(create_app(embedder=HashingEmbedder(), client=client, min_similarity=0.0)) as http:
         yield http, client, db
     db.execute("DELETE FROM queries WHERE question LIKE %s OR answer LIKE %s", (f"%{MARK}%", f"%{MARK}%"))
     db.execute("DELETE FROM queries WHERE question = '[bloqueada: contenía datos de paciente]' "

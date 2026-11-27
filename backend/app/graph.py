@@ -52,8 +52,9 @@ def build_graph(pool: AsyncConnectionPool, embedder: Embedder, client: AsyncAnth
     async def check_evidence(state: State) -> State:
         chunks = state["chunks"]
         best = max((c.similarity or 0 for c in chunks), default=0)
-        has_keyword_hit = any(c.keyword_rank is not None for c in chunks)
-        if not chunks or (best < min_similarity and not has_keyword_hit):
+        # Solo similitud: con la búsqueda léxica en OR, casi cualquier pregunta comparte alguna palabra
+        # ("tratamiento", "niños") y el chequeo no bloqueaba nada. Calibrado en la Fase 8 (ver README).
+        if not chunks or best < min_similarity:
             return {"status": "no_evidence",
                     "message": "No encontré evidencia suficiente en las guías cargadas para responder."}
         return {}

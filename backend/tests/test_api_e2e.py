@@ -35,7 +35,7 @@ def e2e(tmp_path_factory):
            url="https://example.org/ficticia.pdf", publisher="Ficticio")
     fake = FakeAnthropic()
     client = AsyncAnthropic(api_key="sk-test", http_client=httpx2.AsyncClient(transport=fake.transport()))
-    with TestClient(create_app(embedder=HashingEmbedder(), client=client)) as http:
+    with TestClient(create_app(embedder=HashingEmbedder(), client=client, min_similarity=0.0)) as http:
         yield http, fake
     db.execute("DELETE FROM documents WHERE slug = %s", (SLUG,))
     db.execute("DELETE FROM queries WHERE question LIKE '%zz-test-e2e%'")

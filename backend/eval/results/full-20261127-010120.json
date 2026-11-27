@@ -1,0 +1,553 @@
+{
+  "golden": "golden.jsonl",
+  "model": "claude-sonnet-5-5",
+  "metrics": {
+    "answered_verified": 0.7804878048780488,
+    "retracted": 0.13725490196078433,
+    "errors": 0,
+    "false_answer_rate": 0.0,
+    "must_contain": 1.0,
+    "citation_precision": 0.6235613302686474,
+    "faithfulness": 0.9676948051948052,
+    "latency_p50_s": 3.5499856660026126,
+    "latency_p95_s": 6.099765874998411,
+    "rows": [
+      {
+        "id": "dm2-01",
+        "answerable": true,
+        "status": "verified",
+        "latency": 5.9616862919938285,
+        "contains": true,
+        "citation_precision": 1.0,
+        "faithfulness": 1.0,
+        "problems": [],
+        "answer": "La guía GES de Diabetes Mellitus tipo 2 (2017) establece lo siguiente:\n\n- El Grupo de Expertos, como consenso, recomienda fijar la meta de tratamiento en personas adultas mayores frágiles con Diabetes Mellitus 2 en HbA1c <8%.\n- El grado de recomendación es \"Consenso de expertos\" y la certeza en la evidencia figura como \"Consenso\".\n\n**Criterios de fragilidad usados por la guía**\n\nSe considera frágil a la persona que presenta al menos una de las siguientes características:\n- Mayor de 75 años.\n- Comorbilidades crónicas significativas.\n- Desnutrición (Indicie de Masa Corporal < 23).\n- Dependencia para las actividades básicas de la vida diaria (Índice de Barthel ≤ 60).\n- Expectativa de vida menor a 5 años.\n- Caídas frecuentes.\n- Depresión severa.\n- Deterioro cognitivo moderado a severo.\n- Alto riesgo social y económico.\n\n**Otras metas según el estado del paciente (Tabla 1)**\n\n\n- Saludable e independiente: 7-7,5 %.\n- Frágil: <8 %.\n- Estado de salud muy complejo: <8,5 %.\n\n\nEn adultos mayores con estado de salud muy complejo, comorbilidades crónicas en etapa terminal, o declinación funcional o cognitiva severa, se debe evitar la hiperglicemia sintomática con una meta de HbA1c <8,5%.\n\n**Limitaciones de la evidencia**\n\n- No existe evidencia clara sobre los beneficios de fijar la meta en HbA1c menor a 8% en mayores de 65 años con criterios de fragilidad.\n- Hay discrepancia entre las guías revisadas sobre la meta en este grupo, además de diversos criterios de clasificación de fragilidad.\n- Por eso el panel llegó a un consenso de expertos."
+      },
+      {
+        "id": "dm2-02",
+        "answerable": true,
+        "status": "verified",
+        "latency": 6.099765874998411,
+        "contains": true,
+        "citation_precision": 0.5555555555555556,
+        "faithfulness": 1.0,
+        "problems": [],
+        "answer": "La Guía GES Diabetes Mellitus tipo 2 (2017) recomienda los inhibidores de DPP4 por sobre las sulfonilureas.\n\n**Recomendación**\n- Se recomienda el uso de inhibidores de DPP4 comparado con sulfonilureas como tratamiento de primera línea en personas adultas con DM2 que tengan contraindicación o no toleren la metformina.\n- La certeza de la evidencia es \"Condicional a favor de Inhibidor de DPP4\" y la calidad de la evidencia es baja.\n\n**Por qué la guía prefiere DPP4**\n- Los expertos destacaron que los I-DPP4 disminuyen el peso corporal y tienen menor riesgo de hipoglicemias.\n- La evidencia mostró que ambas familias eran clínicamente efectivas para disminuir la HbA1c.\n- En hipoglicemia leve, moderada y total, el rango en OR fue 3.8-12.4 para las sulfonilureas, con certeza moderada.\n- En el control glicémico, la diferencia de la media entre grupos fue de -0.13%, -0.22% y -0.28% a favor de SU (certeza moderada).\n- Los efectos adversos gastrointestinales no favorecieron a ningún fármaco.\n\n**Limitaciones que menciona la guía**\n- En hipoglicemias severas no hubo diferencias significativas entre las familias. El seguimiento fue corto y ningún estudio incluyó glibenclamida, la sulfonilurea con mayor riesgo de hipoglicemia, lo que podría significar un sesgo."
+      },
+      {
+        "id": "dm2-03",
+        "answerable": true,
+        "status": "verified",
+        "latency": 5.196064916992327,
+        "contains": true,
+        "citation_precision": 0.5,
+        "faithfulness": 1.0,
+        "problems": [],
+        "answer": "Según la Guía GES Diabetes Mellitus tipo 2 (2017), esto es lo que recomiendan (no es una indicación para un paciente específico).\n\n**Qué recomienda la guía**\n- En caso de indicar alguna sulfonilurea, se recomienda utilizar Gliclazida o Glimepirida comparado con Glibenclamida como tratamiento de primera línea en personas adultas con Diabetes Mellitus 2 que tengan contraindicación o no toleren el uso de Metformina.\n- Certeza de la evidencia: condicional a favor de la Gliclazida o Glimepirida. Calidad de la evidencia: baja.\n\n**Qué evitar y por qué**\n- El Grupo de Expertos recomienda evitar el uso de Glibenclamida por el alto riesgo de hipoglicemias y el mayor riesgo de mortalidad comparado con la Gliclazida y Glimepirida.\n- Hipoglicemias: los estudios mostraron mayor riesgo con Glibenclamida (RR 1.83 95% IC (1.35-2.49), I2 43.4%) comparado con las otras sulfonilureas incluidas.\n- Mortalidad: la comparación entre Glibenclamida y Gliclazida evidenció un mayor riesgo de mortalidad con Glibenclamida, RR 1.52 (1.13, 2.04).\n- Calidad de la evidencia: la calidad global fue baja, pero moderada para el desenlace de hipoglicemias.\n\n**Adultos mayores**\n- Según la recomendación de la OMS, la Glibenclamida debe evitarse en pacientes mayores de 60 años.\n- Los criterios de Beers recomiendan evitar su uso en población de 65 años o mayor.\n\n**Otros desenlaces**\n- No hubo diferencias significativas en control glicémico entre Glibenclamida y las otras sulfonilureas, con una diferencia de las medias ponderadas entre grupos de HbA1c -0.03% (-0.13%, 0.07%)."
+      },
+      {
+        "id": "dm2-04",
+        "answerable": true,
+        "status": "verified",
+        "latency": 5.166369250015123,
+        "contains": true,
+        "citation_precision": 0.9090909090909091,
+        "faithfulness": 1.0,
+        "problems": [],
+        "answer": "La guía GES de Diabetes Mellitus tipo 2 (2017) responde esta pregunta directamente.\n\n**Recomendación**\n- Se recomienda el uso de Inhibidores de DPP4 comparado con Inhibidores SGLT2 como tratamiento de primera línea en personas adultas con Diabetes Mellitus 2 que tengan contraindicación o no toleren el uso de Metformina.\n- Certeza de la evidencia: Condicional a favor de Inhibidores de DPP4. Calidad de la evidencia: Muy baja.\n\n**Matiz sobre los iSGLT2**\n- El Grupo de Expertos recalcó que existe aún poca evidencia por tratarse de fármacos más novedosos. Los Inhibidores de SGLT2 han demostrado superioridad en la disminución del peso corporal comparado con los Inhibidores DPP4.\n- Por ello, se sugiere considerar los Inhibidores de SGLT2 en personas adultas con IMC>30 kg/m2.\n- También se debe considerar el alto costo económico de estos fármacos para su implementación.\n\n**Qué mostró la comparación directa**\n- Control glicémico (HbA1c): diferencia no significativa entre grupos de 0.01% (-0.03%, 0.3%); no se favorece ningún fármaco (certeza muy baja).\n- Aumento de peso: diferencia de media entre grupos de 2.5 kg (Emp 10 mg) y 2.7 kg (Emp 25 mg); Inhibidores de SGLT-2 favorecidos (certeza moderada).\n- Hipoglicemia severa: 0 eventos encontrados; no se favorece ningún fármaco.\n- Mortalidad: existe evidencia de que la Empaglifozina disminuye la mortalidad por causas cardiovasculares, pero aún falta más evidencia para concluir sobre el tema.\n- Efectos adversos GI: no se encontraron estudios que evaluaran este desenlace."
+      },
+      {
+        "id": "dm2-05",
+        "answerable": true,
+        "status": "verified",
+        "latency": 5.025444292026805,
+        "contains": true,
+        "citation_precision": 0.36363636363636365,
+        "faithfulness": 1.0,
+        "problems": [],
+        "answer": "La guía GES de Diabetes Mellitus tipo 2 (2017) recomienda metformina con iDPP4.\n\n**Recomendación**\n- Se recomienda la combinación de metformina con inhibidores de DPP4 frente a metformina con sulfonilureas como segunda línea en adultos con DM2 que no alcanzan la meta de HbA1c con monoterapia.\n- La certeza de la evidencia es condicional a favor de metformina con iDPP4, y la calidad de la evidencia es baja.\n- El grupo de expertos considera el mayor costo de los iDPP4 y sugiere privilegiar esta asociación especialmente en adultos mayores frágiles y en pacientes con DM2 y alto riesgo de hipoglicemia.\n\n**Resultados que sustentan la recomendación**\n- Control glicémico: no se favorece ninguna combinación. Los estudios usaron dosis moderadas o submáximas de sulfonilureas frente a dosis máximas de iDPP4.\n- Hipoglicemia: hubo diferencias significativas en hipoglicemias totales, leves y severas, todas a favor de metformina con iDPP4. Para hipoglicemia severa, OR 0.09, 95% IC (0.03 a 0.26); para total y leve, OR 0.07, 95% IC (0.04, 0.14).\n- Mortalidad: el metaanálisis dio OR 0.64, 95% IC (0.27 a 1.5), a favor de metformina con iDPP4 pero sin ser significativo. Un estudio observacional reportó RR ajustado 0.65, 95% IC (0.54 a 0.8).\n- Aumento de peso: se favorece metformina con iDPP4, con certeza alta.\n- Efectos adversos gastrointestinales: no hubo diferencias significativas (OR 0.97, 95% IC 0.76 a 1.24)."
+      },
+      {
+        "id": "dm2-06",
+        "answerable": true,
+        "status": "retracted",
+        "latency": 6.024038292001933,
+        "contains": true,
+        "citation_precision": 0.5384615384615384,
+        "problems": [
+          "Dato numérico sin cita: «Rule 5: no puedo indicar una conducta para un paciente específico, pero sí explicar qué recomiendan las guías para este »"
+        ],
+        "answer": "Rule 5: no puedo indicar una conducta para un paciente específico, pero sí explicar qué recomiendan las guías para este perfil (Guía GES Diabetes Mellitus tipo 2, 2017).\n\n**Metformina + Análogos de GLP-1**\n- La recomendación general de segunda línea favorece Metformina con Sulfonilureas frente a Metformina con Análogos GLP-1. La certeza es condicional y la calidad de la evidencia, baja.\n- Para este perfil la guía hace una excepción: en personas con IMC>30 kg/m2 o con alto riesgo de hipoglicemia que no logren la meta de HbA1c con monoterapia, se sugiere la combinación de Metformina con Análogos GLP-1, por su mayor baja de peso corporal y menor riesgo de hipoglicemias.\n- También menciona los resultados positivos de Liraglutide en disminución de mortalidad en pacientes con DM2 y enfermedad cardiovascular establecida.\n- Se debe considerar su alto costo y su administración inyectable.\n\n**Metformina + Inhibidores de SGLT2**\n- La guía recomienda Metformina con Inhibidores de SGLT2 frente a Metformina con Sulfonilureas. La certeza es condicional y la calidad de la evidencia, baja.\n- Por su alto costo, se debe dar preferencia a personas con IMC>30 kg/m2 o con alto riesgo de hipoglicemia.\n- Empaglifozina se asocia a disminución de insuficiencia cardiaca y mortalidad en pacientes con DM2 y enfermedad cardiovascular establecida.\n\n**Metformina + Inhibidores de DPP4**\n- La guía recomienda Metformina con Inhibidores de DPP4 frente a Metformina con Sulfonilureas como segunda línea (condicional, certeza baja).\n- Esta combinación mostró menos hipoglicemias totales, leves y severas que Metformina más Sulfonilureas.\n\nLas guías cargadas no comparan directamente GLP-1, SGLT2 y DPP4 entre sí en segunda línea. Las comparaciones son siempre contra sulfonilureas."
+      },
+      {
+        "id": "dm2-07",
+        "answerable": true,
+        "status": "verified",
+        "latency": 4.670110000006389,
+        "contains": true,
+        "citation_precision": 0.75,
+        "faithfulness": 0.8571428571428571,
+        "problems": [],
+        "answer": "La guía GES de Diabetes Mellitus tipo 2 (2017) responde esta pregunta. Es una recomendación por consenso de expertos.\n\n**Situaciones en que recomienda iniciar insulina**\n\n- Debut inestable: sintomático (poliuria, polidipsia, baja de peso) y glicemia >300 mg/dL HbA1c >9%.\n- Durante la evolución, con inestabilidad (independiente de la fase de tratamiento o si está con uno o más fármacos): sintomático (poliuria, polidipsia, baja de peso) y HbA1c >9% o glicemia >300 mg/dL.\n- Con dos exámenes de HbA1c en 6 meses que no cumple la meta individualizada con 2 o 3 fármacos orales en dosis máxima tolerada.\n\n**Grado de recomendación**\n\nEl grado de recomendación es \"Consenso de expertos\" y la certeza en la evidencia figura como \"Consenso\".\n\n**Situaciones especiales**\n\nLa guía indica que hay situaciones donde se debe evaluar la necesidad de insulina de manera temporal: embarazo, hiperglicemia intrahospitalaria, patología intercurrente y tratamiento con corticoides. Una vez estabilizado el paciente con insulina, su continuidad debe ser reevaluada, tanto al debut como en la evolución de la enfermedad.\n\n**Qué tipo de insulina**\n\nLa guía sugiere indicar insulina NPH como inicio de tratamiento sobre los análogos, por costo-efectividad y beneficios similares. Recomienda análogos en caso de tendencia a hipoglicemias nocturnas con NPH, o en pacientes de alto riesgo de hipoglicemia y con problemas con el uso de jeringas."
+      },
+      {
+        "id": "dm2-08",
+        "answerable": true,
+        "status": "verified",
+        "latency": 5.643330332997721,
+        "contains": true,
+        "citation_precision": 0.4444444444444444,
+        "faithfulness": 1.0,
+        "problems": [],
+        "answer": "La guía GES de Diabetes Mellitus tipo 2 (2017) responde esta pregunta en su Recomendación 10.\n\n**Recomendación**\n- La evidencia muestra beneficios similares entre NPH y los análogos de insulina. Si se considera la costo-efectividad de ambos fármacos, se sugiere indicar insulina NPH como inicio de tratamiento sobre los análogos de insulina.\n- Certeza de la evidencia: Condicional a favor de los NPH.\n- Calidad de la evidencia: Muy baja.\n\n**Excepciones que menciona la guía**\n- En caso de tendencia a hipoglicemias nocturnas en paciente en terapia con NPH y/o pacientes de alto riesgo de hipoglicemia y problemas con el uso de jeringas para administrar la terapia, se recomienda el uso de insulinas análogas.\n\n**Evidencia que la sustenta**\n- La guía usó una revisión Cochrane que comparó Glargina y Detemir con NPH. Incluyó 3 estudios controlados aleatorizados para Detemir y NPH, y 9 para Glargina y NPH.\n- No hubo diferencias significativas en control glicémico ni en hipoglicemias severas entre NPH y los análogos.\n- Sí hubo menor riesgo de hipoglicemia nocturna para Detemir y Glargina frente a NPH (RR 0.53 (0.31 a 0.91) y 0.56 (0.47 to 0.68) respectivamente), aunque con certeza de la evidencia baja y muy baja.\n\n**Costo-efectividad**\n- La guía NICE concluyó que Glargina es costo efectiva frente a NPH en la población de UK. Con Detemir, concluyó que NPH debiese preferirse como primera línea con insulina. Los análogos muestran ventajas leves frente a NPH, pero a un costo mucho más elevado.\n- El grupo de expertos de ICER (2014) concluyó que la NPH es funcionalmente equivalente a los análogos para la mayoría de los pacientes con diabetes mellitus 2. Señaló que el mayor riesgo de hipoglicemias con NPH podía favorecer los análogos en ciertas personas."
+      },
+      {
+        "id": "dm2-09",
+        "answerable": true,
+        "status": "retracted",
+        "latency": 3.338421416003257,
+        "contains": true,
+        "citation_precision": 1.0,
+        "problems": [
+          "Dato numérico sin cita: «Hay una diferencia interna en la guía que conviene notar. Indica reducir la dosis a la mitad en etapa 3b-5, pero también»"
+        ],
+        "answer": "En la guía GES de Diabetes Mellitus tipo 2 (2017):\n\n- La dosis de Metformina debiese ser reducida a la mitad en Enfermedad Renal Crónica etapa 3b-5 (VFG < 45 ml/min), por el riesgo aumentado de complicaciones severas (Insuficiencia Renal Aguda, acidosis láctica).\n- Entre las contraindicaciones absolutas de Metformina, relacionadas con un aumento importante de la incidencia de acidosis láctica, está la enfermedad renal crónica avanzada (VFG < 30 ml/min).\n\nHay una diferencia interna en la guía que conviene notar. Indica reducir la dosis a la mitad en etapa 3b-5, pero también señala contraindicación absoluta con VFG < 30 ml/min. La guía no aclara en los fragmentos entregados cómo se concilian ambos puntos.\n\nLas guías cargadas no entregan una dosis específica en mg ni ajustes para otras etapas de la enfermedad renal."
+      },
+      {
+        "id": "dm2-10",
+        "answerable": true,
+        "status": "verified",
+        "latency": 2.736254583025584,
+        "contains": true,
+        "citation_precision": 1.0,
+        "faithfulness": 1.0,
+        "problems": [],
+        "answer": "Según la Guía de Práctica Clínica GES Diabetes Mellitus tipo 2 (2017), las contraindicaciones absolutas a Metformina, relacionadas con un aumento importante de la incidencia de acidosis láctica, son:\n\n- Enfermedad renal crónica avanzada (VFG < 30 ml/min).\n- Enfermedad hepática avanzada.\n- Insuficiencia cardiaca severa o en crisis aguda.\n\nLa guía agrega que la dosis de Metformina debiese ser reducida a la mitad en Enfermedad Renal Crónica etapa 3b-5 (VFG < 45 ml/min) por el riesgo aumentado de complicaciones severas (Insuficiencia Renal Aguda, acidosis láctica)."
+      },
+      {
+        "id": "dm2-11",
+        "answerable": true,
+        "status": "verified",
+        "latency": 3.28713629100821,
+        "contains": true,
+        "citation_precision": 0.75,
+        "faithfulness": 1.0,
+        "problems": [],
+        "answer": "Una meta razonable de HbA1c para la mayoría de las personas adultas con DM2 es menor a 7%. (Guía GES Diabetes Mellitus tipo 2, 2017)\n\nMatices que menciona la guía:\n\n- Se puede considerar una meta más estricta (menor a 6.5%) en individuos seleccionados: DM2 de pocos años de duración, sin antecedentes de enfermedad cardiovascular y con larga expectativa de vida. Esto, siempre que puedan alcanzarla sin aumentar significativamente el riesgo de hipoglicemia, polifarmacia u otros riesgos asociados a la terapia.\n- Metas menos exigentes pueden ser apropiadas en pacientes con DM2 de larga data, adultos mayores, historia de hipoglicemia severa, complicaciones avanzadas de la DM2 u otras comorbilidades.\n- En personas adultas mayores frágiles con DM2, el grupo de expertos recomienda, por consenso, una meta de HbA1c <8%."
+      },
+      {
+        "id": "dm2-12",
+        "answerable": true,
+        "status": "retracted",
+        "latency": 3.8076957919984125,
+        "contains": true,
+        "citation_precision": 0.6666666666666666,
+        "problems": [
+          "Dato numérico sin cita: «**Meta más estricta (menor a 6.5%):**»"
+        ],
+        "answer": "La guía GES de Diabetes Mellitus tipo 2 (2017) indica lo siguiente.\n\n**Meta general en adultos:** una meta razonable de HbA1c para la mayoría de las personas adultas con DM2 es menor a 7%.\n\n**Meta más estricta (menor a 6.5%):** se puede considerar en individuos seleccionados: pacientes con DM2 de pocos años de duración, sin antecedentes de enfermedad cardiovascular y con larga expectativa de vida.\n\nCondición: siempre que puedan alcanzarla sin aumentar significativamente el riesgo de hipoglicemia, polifarmacia u otros riesgos asociados a la terapia.\n\n**En adultos mayores:** la Tabla 1 de la guía señala, para el paciente saludable e independiente, una meta de 7-7,5 %*. La nota aclara que puede considerarse una meta menor en pacientes saludables, con expectativa de vida de más de 10 años, sin tendencia a hipoglicemia, y que la meta se logre con terapia simple y con fármacos de bajo riesgo de hipoglicemia.\n\n**Metas menos exigentes:** pueden ser apropiadas en pacientes con DM2 de larga data, adultos mayores, historia de hipoglicemia severa, complicaciones avanzadas u otras comorbilidades."
+      },
+      {
+        "id": "dm2-13",
+        "answerable": true,
+        "status": "verified",
+        "latency": 3.333268999995198,
+        "contains": true,
+        "citation_precision": 0.8,
+        "faithfulness": 1.0,
+        "problems": [],
+        "answer": "Según la Guía de Práctica Clínica GES Diabetes Mellitus tipo 2 (2017), la meta de HbA1c para un adulto mayor saludable e independiente es 7-7,5 %. La guía define a este paciente como alguien con pocas comorbilidades e integridad funcional y cognitiva.\n\nEsa cifra lleva una nota: puede considerarse una meta menor en pacientes saludables, con expectativa de vida de más de 10 años, sin tendencia a hipoglicemia y que la meta se logre con terapia simple y con uso de fármacos con bajo riesgo de hipoglicemia.\n\nPara comparar, la misma tabla fija estas metas en otros grupos:\n- Frágil: <8 %.\n- Estado de salud muy complejo: <8,5 %.\n\nLa guía además señala que existe discrepancia entre las guías revisadas sobre la meta de tratamiento en este grupo de pacientes."
+      },
+      {
+        "id": "dm2-14",
+        "answerable": true,
+        "status": "retracted",
+        "latency": 3.787785625027027,
+        "contains": true,
+        "citation_precision": 1.0,
+        "problems": [
+          "Dato numérico sin cita: «Según la Guía de Práctica Clínica GES Diabetes Mellitus tipo 2 (2017), la meta de HbA1c es <8,5%.\n\n-»"
+        ],
+        "answer": "Según la Guía de Práctica Clínica GES Diabetes Mellitus tipo 2 (2017), la meta de HbA1c es <8,5%.\n\n- Para personas adultas mayores con Diabetes Mellitus 2 con estado de salud muy complejo, comorbilidades crónicas en etapa terminal, declinación funcional o cognitiva severa, se debe evitar hiperglicemia sintomática con una meta de HbA1c <8,5%.\n- La tabla resumen de la guía asigna <8,5 % al estado de salud muy complejo (comorbilidades crónicas en etapa terminal, declinación funcional o cognitiva severa).\n- En pacientes con cuidados al fin de la vida, el objetivo es evitar hiperglicemia sintomática.\n\nComo referencia, la misma tabla indica otras metas según el estado del paciente:\n- Saludable e independiente: 7-7,5 %.\n- Frágil: <8 %.\n\nLa meta de <8% para adultos mayores frágiles corresponde a una recomendación por consenso del Grupo de Expertos."
+      },
+      {
+        "id": "dm2-15",
+        "answerable": true,
+        "status": "verified",
+        "latency": 4.942063374997815,
+        "contains": true,
+        "citation_precision": 0.9333333333333333,
+        "faithfulness": 1.0,
+        "problems": [],
+        "answer": "La guía GES de Diabetes Mellitus tipo 2 (2017) define fragilidad por consenso de expertos. El panel decidió llegar a un consenso de expertos para definir tanto los criterios de fragilidad como las metas de HbA1c, porque existe discrepancia entre las guías revisadas sobre la meta de tratamiento y diversos criterios de clasificación de fragilidad.\n\n**Criterio de inclusión:** se considera fragilidad si la persona presenta al menos una de las siguientes características:\n\n- Mayor de 75 años.\n- Comorbilidades crónicas significativas.\n- Desnutrición (Indicie de Masa Corporal < 23).\n- Dependencia para las actividades básicas de la vida diaria (Índice de Barthel ≤ 60).\n- Expectativa de vida menor a 5 años.\n- Caídas frecuentes.\n- Depresión severa.\n- Deterioro cognitivo moderado a severo.\n- Alto riesgo social y económico.\n\n**Meta asociada:** el Grupo de Expertos, como consenso, recomienda fijar la meta de tratamiento en personas adultas mayores frágiles con Diabetes Mellitus 2 en HbA1c <8%. El grado de recomendación es \"Consenso de expertos\".\n\n**Estado de salud muy complejo:** en personas con comorbilidades crónicas en etapa terminal, declinación funcional o cognitiva severa, se debe evitar hiperglicemia sintomática con una meta de HbA1c <8,5%."
+      },
+      {
+        "id": "dm2-16",
+        "answerable": true,
+        "status": "abstained",
+        "latency": 3.691088250023313,
+        "contains": false,
+        "citation_precision": 0.25,
+        "problems": [],
+        "answer": "Las guías cargadas no responden esta pregunta.\n\nCubren temas cercanos: la guía GES Diabetes Mellitus tipo 2 (2017) describe cómo se buscó la evidencia y qué recomienda en primera línea cuando hay contraindicación o intolerancia a Metformina.\n\nAlgunos datos relacionados, sin que esto equivalga a una lista de fármacos excluidos:\n\n- Esta guía reemplaza las recomendaciones de tratamiento farmacológico y de metas de compensación para adultos mayores de la guía de 2009.\n- Las preguntas de primera línea que aparecen en los resultados comparan Sulfonilureas e Inhibidores de DPP4, y entre las Sulfonilureas, Gliclazida o Glimepirida frente a Glibenclamida.\n- Se encontraron 8 GPC, de las cuales se seleccionaron 7 por responder a 1 o más de las preguntas clínicas. Esto se refiere a las guías revisadas, no a fármacos.\n\nLos fragmentos entregados no incluyen la lista completa de preguntas clínicas ni un apartado de fármacos no considerados."
+      },
+      {
+        "id": "dm2-17",
+        "answerable": true,
+        "status": "verified",
+        "latency": 2.1969949580088723,
+        "contains": true,
+        "citation_precision": 0.5,
+        "faithfulness": 1.0,
+        "problems": [],
+        "answer": "Según la Guía de Práctica Clínica GES Diabetes Mellitus tipo 2 (2017), al comparar la Encuesta Nacional de Salud (ENS) del año 2003 con la del 2009-2010, se evidenció un incremento en la prevalencia de un 6,3% a un 9,4%.\n\nLa misma guía señala que la población adulta mayor de 65 años con diabetes aumentó de 15.2 a 25.8% entre los años 2003 y 2009-2010."
+      },
+      {
+        "id": "dm2-18",
+        "answerable": true,
+        "status": "verified",
+        "latency": 6.316691042011371,
+        "contains": true,
+        "citation_precision": 0.6923076923076923,
+        "faithfulness": 0.8333333333333334,
+        "problems": [],
+        "answer": "La guía GES de Diabetes Mellitus tipo 2 (2017) recomienda la combinación con iSGLT2.\n\n**Recomendación**\n- Se recomienda metformina con inhibidores de SGLT2 en lugar de metformina con sulfonilureas, en adultos con DM2 que no alcanzan la meta de HbA1c con monoterapia.\n- Certeza de la evidencia: condicional a favor de la combinación de metformina con inhibidores de SGLT2. Calidad de la evidencia: baja.\n\n**Comentarios de la guía**\n- Por el alto costo de los iSGLT2, se debe dar preferencia a personas con IMC>30 kg/m2 o con alto riesgo de hipoglicemia.\n- Empaglifozina se asocia a disminución de insuficiencia cardiaca y mortalidad en pacientes con DM2 y enfermedad cardiovascular establecida, por lo que también puede considerarse en esta población.\n\n**Resultados que sustentan la recomendación**\n- HbA1c: diferencia de 0.17% (0.14% - 0.2%), favorece a metformina-iSGLT2, certeza moderada.\n- Hipoglicemia leve, moderada y total: OR 0.08 (0.03 a 0.17), favorece a metformina-iSGLT2, certeza alta.\n- Hipoglicemia severa: 7% con metformina más sulfonilureas versus 1.7% con metformina más iSGLT2.\n- Peso: diferencia de la media entre grupos de 4.7 kg, 95% IC (4.4 a 5 kg), favorece a metformina-iSGLT2.\n- Mortalidad: sin diferencias significativas (OR 0.86, 95% IC 0.29 a 2.55).\n- Efectos adversos GI: no se favorece ninguna combinación.\n\n**Limitaciones señaladas**\n- Todos los estudios usaron dosis máximas de iSGLT2 frente a dosis submáximas de sulfonilureas, lo que pudo introducir sesgo.\n- Las comparaciones no incluyeron glibenclamida, fármaco que ha presentado mayor riesgo de mortalidad dentro de las sulfonilureas."
+      },
+      {
+        "id": "dm2-19",
+        "answerable": true,
+        "status": "verified",
+        "latency": 2.4607434579811525,
+        "contains": true,
+        "citation_precision": 1.0,
+        "faithfulness": 1.0,
+        "problems": [],
+        "answer": "La guía GES de Diabetes Mellitus tipo 2 (2017) indica que existen situaciones especiales en donde se debe evaluar la necesidad de uso de insulina de manera temporal:\n\n- Embarazo.\n- Hiperglicemia intrahospitalaria.\n- Patología intercurrente.\n- Tratamiento con corticoides.\n\nLa guía agrega que una vez que el paciente se estabiliza con el uso de insulina, su continuidad debe ser reevaluada tanto al debut como en la evolución de la enfermedad."
+      },
+      {
+        "id": "dm2-20",
+        "answerable": true,
+        "status": "abstained",
+        "latency": 2.354348499997286,
+        "contains": false,
+        "citation_precision": 0.0,
+        "problems": [],
+        "answer": "Las guías cargadas no responden esta pregunta.\n\nCubren temas cercanos: las metas de HbA1c según el estado del paciente (2017) y el aumento de la población adulta mayor con diabetes en Chile.\n\n- En Chile, la población adulta mayor de 65 años con diabetes aumentó de 15.2 a 25.8% entre los años 2003 y 2009-2010.\n- Una meta razonable de HbA1c para la mayoría de las personas adultas con diabetes mellitus tipo 2 es menor a 7%.\n\nNinguno de los resultados indica qué porcentaje de las personas con diabetes en Chile alcanza esa meta."
+      },
+      {
+        "id": "dep-01",
+        "answerable": true,
+        "status": "verified",
+        "latency": 4.1786600000050385,
+        "contains": true,
+        "citation_precision": 0.8333333333333334,
+        "faithfulness": 1.0,
+        "problems": [],
+        "answer": "Según la Guía Clínica GES Depresión en personas de 15 años y más (2013), para la depresión leve se recomienda lo siguiente:\n\n- Iniciar con opciones terapéuticas no farmacológicas en depresiones leves (nivel de evidencia 1, grado de recomendación A).\n- Considerar las técnicas de autoayuda guiadas para el tratamiento de pacientes con depresiones leves (1 A).\n\nAdemás, hay recomendaciones generales que aplican a todas las personas con depresión:\n\n- La consejería, la intervención psicosocial grupal y la psicoeducación son recomendables para todas las personas con depresión (1 A).\n- Se recomienda indicar un programa estructurado de actividad física (1 A).\n- La terapia cognitivo conductual, la terapia interpersonal, la terapia sistémica familiar y la terapia de activación conductual se recomiendan para el tratamiento de la depresión de adultos (1 A).\n\nSobre la comorbilidad, la guía señala que en las depresiones leves o en pacientes eutímicos, el orden de prioridad del tratamiento es inverso al de las depresiones moderadas o severas, donde el trastorno depresivo tiene la prioridad.\n\nEstas son las recomendaciones de la guía y no constituyen una indicación para un paciente específico."
+      },
+      {
+        "id": "dep-02",
+        "answerable": true,
+        "status": "verified",
+        "latency": 3.2932352909992915,
+        "contains": true,
+        "citation_precision": 0.3333333333333333,
+        "faithfulness": 1.0,
+        "problems": [],
+        "answer": "Según la Guía Clínica GES Depresión en personas de 15 años y más (2013), el umbral depende de la versión de la escala:\n\n- Escala de Depresión Posparto de Edimburgo (Anexo 5): una puntuación de 11 ó más puntos indica sospecha de depresión postparto.\n- Escala de Depresión en el Embarazo de Edimburgo (Anexo 6): una puntuación de 13 o más puntos indica sospecha de depresión postparto.\n\nEn ambas versiones, cualquier puntaje distinto de cero en la pregunta Nº 10 requiere de devaluación adicional dentro de 24 horas.\n\nLa guía indica además que la Escala de Edimburgo resulta adecuada para el tamizaje de la depresión en el embarazo y el posparto en mujeres de 18 años y más. También señala que este instrumento no parece adecuado para discriminar entre distintos tipos de depresión (leve, moderada o grave).\n\nLa fuente es una sola guía (2013), pero presenta dos umbrales según el anexo."
+      },
+      {
+        "id": "dep-03",
+        "answerable": true,
+        "status": "retracted",
+        "latency": 4.404498166986741,
+        "contains": true,
+        "citation_precision": 1.0,
+        "problems": [
+          "Dato numérico sin cita: «- Adolescentes hasta 18 años:»"
+        ],
+        "answer": "**Instrumento recomendado (Guía Clínica GES Depresión, 2013)**\n\n- El GHQ-12 se utilizará para la detección de depresión en consultantes de 15 años y más (nivel de evidencia y grado de recomendación 1 A).\n- El Cuestionario de Salud General de Goldberg (GHQ-12) está validado en Chile y se usa como instrumento de tamizaje autoaplicado en toda persona de 15 años y más. Se considera sospecha de depresión un puntaje igual o mayor de 5 puntos.\n\n**Otros instrumentos según población**\n\n- Embarazo y posparto: se utilizará la escala de Edimburgo (1 A). Resulta adecuada en mujeres de 18 años y más.\n- PHQ-9: está validado para personas chilenas de 20 años y más. La validación excluye a quienes tienen de 15 a 19 años, por lo que no se recomienda su uso en esa población.\n- Adolescentes hasta 18 años: el Inventario de Depresión de Beck-II ha sido validado por Melipillán y cols.\n- Población geriátrica: la versión de 5 ítems de la Escala de Depresión Geriátrica, con puntaje de corte mayor o igual a 2 puntos, identifica a los sujetos presumiblemente deprimidos.\n\n**Condición del tamizaje**\n\n- El tamizaje siempre deberá ser parte de un plan de acción e incluir retroalimentación de resultados al paciente (1 A)."
+      },
+      {
+        "id": "dep-04",
+        "answerable": true,
+        "status": "verified",
+        "latency": 3.5499856660026126,
+        "contains": true,
+        "citation_precision": 0.6666666666666666,
+        "faithfulness": 1.0,
+        "problems": [],
+        "answer": "La fluoxetina es el fármaco con más evidencia. Según la Guía Clínica GES Depresión en personas de 15 años y más (2013), la fluoxetina es el fármaco con mayor evidencia para el tratamiento de la depresión en el embarazo, incluyendo el primer trimestre.\n\nContexto que da la misma guía:\n\n- Durante el embarazo, los fármacos no se recomiendan como primera línea de tratamiento, a menos que haya un claro beneficio que compense los riesgos potenciales.\n- Un estudio naturalístico mostró que las mujeres que discontinuaron el tratamiento farmacológico al momento del embarazo tuvieron más recaídas que aquellas que lo mantuvieron.\n- Faltan estudios para determinar si el uso de ISRS durante el último trimestre de la gestación es seguro.\n- En el caso de los ISRS no existe evidencia consistente respecto del riesgo de malformaciones. La mayor asociación entre malformaciones y tratamiento con ISRS se encuentra entre la paroxetina y las malformaciones cardíacas, sin que sea totalmente concluyente."
+      },
+      {
+        "id": "dep-05",
+        "answerable": true,
+        "status": "verified",
+        "latency": 3.6389322910108604,
+        "contains": true,
+        "citation_precision": 0.7142857142857143,
+        "faithfulness": 1.0,
+        "problems": [],
+        "answer": "Según la Guía Clínica GES Depresión en personas de 15 años y más (2013), los criterios para determinar el alta clínica se definieron por consenso del grupo de expertos. Son cuatro:\n\n- Disminución significativa de la sintomatología depresiva evaluada con criterios objetivos.\n- Recuperación funcional.\n- Estado de ánimo eutímico por un período prolongado.\n- Estabilización en depresiones graves o con comorbilidad.\n\nOtras recomendaciones de la misma guía, relacionadas con el alta:\n\n- Toda persona tratada por depresión, independientemente de la gravedad, debe recibir seguimiento por a lo menos 6 meses contados desde la remisión total de los síntomas (nivel de evidencia 1, grado A).\n- El tratamiento farmacológico debe extenderse por 6 a 12 meses luego de la remisión completa de síntomas, en todos los grupos poblacionales (nivel de evidencia 2, grado B).\n\nLos criterios de alta no tienen nivel de evidencia ni grado de recomendación asociado, porque provienen de consenso de expertos."
+      },
+      {
+        "id": "dep-06",
+        "answerable": true,
+        "status": "verified",
+        "latency": 2.9365658340102527,
+        "contains": true,
+        "citation_precision": 0.3333333333333333,
+        "faithfulness": 1.0,
+        "problems": [],
+        "answer": "La guía recomienda evaluar el riesgo suicida de forma periódica, pero no define un intervalo específico.\n\n- La recomendación es evaluar riesgo suicida en todo paciente con depresión de forma periódica, con nivel de evidencia 2 y grado de recomendación B.\n- La ideación suicida debe pesquisarse precozmente en los trastornos depresivos.\n- En los cuadros de intensidad moderada es posible el tratamiento ambulatorio, controlando al usuario frecuentemente.\n\nFuente: Guía Clínica GES Depresión en personas de 15 años y más (2013).\n\nLas guías cargadas no indican cada cuántos días, semanas o meses debe repetirse la evaluación."
+      },
+      {
+        "id": "dep-07",
+        "answerable": true,
+        "status": "retracted",
+        "latency": 4.9445410420012195,
+        "contains": true,
+        "citation_precision": 0.9090909090909091,
+        "problems": [
+          "Dato numérico sin cita: «La guía GES de Depresión en personas de 15 años y más (2013) señala criterios de hospitalización en dos secciones.\n\n**Re»"
+        ],
+        "answer": "La guía GES de Depresión en personas de 15 años y más (2013) señala criterios de hospitalización en dos secciones.\n\n**Recomendación (nivel de evidencia 4, grado C):**\nEl alto grado de letalidad en un intento suicida, los intentos suicidas previos, la escasa o nula red de apoyo y la enfermedad psiquiátrica descompensada comorbida a un intento suicida son criterios para hospitalización.\n\n**Tabla Nº 17, criterios para hospitalizar a personas con alto riesgo suicida:**\n- Elevada intención suicida.\n- Ideación suicida severa con intentos de suicidio con alta letalidad y/o utilización de método violento (ahorcamiento, arma de fuego, etc.).\n- Intento de suicidio ampliado con homicidio de hijos y cónyuge, pacto suicida.\n- Uso de más de un método simultáneamente.\n- Intentos suicidas repetidos en lapso más bien breve.\n\n**Definiciones de la guía para un intento severo:**\n- Método de elevada letalidad (intento de ahorcamiento, uso de arma de fuego, gas o venenos, salto desde altura).\n- Alta intención suicida (premeditación, búsqueda de aislamiento o soledad, búsqueda de la muerte, ocultamiento o negación del intento).\n\n**Otros puntos de la guía:**\n- La hospitalización es una medida terapéutica útil cuando la ideación suicida se asocia con factores de riesgo.\n- En los cuadros de intensidad moderada es posible el tratamiento ambulatorio, con controles frecuentes.\n- Quien ha realizado un intento suicida debe ser evaluado por especialista e ingresado a tratamiento por depresión entre el intento y dicha evaluación psiquiátrica (nivel de evidencia 4, grado C)."
+      },
+      {
+        "id": "dep-08",
+        "answerable": true,
+        "status": "verified",
+        "latency": 7.244980875024339,
+        "contains": true,
+        "citation_precision": 0.5,
+        "faithfulness": 0.7,
+        "problems": [],
+        "answer": "La Guía Clínica GES Depresión en personas de 15 años y más (2013) plantea lo siguiente para la depresión resistente o refractaria:\n\n- **Reevaluar el diagnóstico inicial.** En depresiones resistentes o refractarias se debe reevaluar el diagnóstico inicial, sospechar trastorno bipolar, comorbilidad o trastorno de personalidad. La guía asigna grado 2 B en la tabla de tratamiento y 1 A en las recomendaciones clave. Es una diferencia dentro del mismo documento.\n- **Optimizar o cambiar el tratamiento.** En depresiones refractarias se debe optimizar dosis o cambiar antidepresivo, y/o potenciar con litio, liotironina o un segundo antidepresivo. Grado de recomendación: 1 A.\n- **Terapia electroconvulsiva.** En la depresión grave resistente a tratamiento se puede utilizar Terapia electroconvulsiva modificada. Grado de recomendación: 1 A.\n\nLa síntesis de evidencia detalla las estrategias biológicas:\n\n- **Optimizar dosis:** utilizar las dosis más altas que tolere la persona y que contribuyan al alivio sintomático.\n- **Cambiar de antidepresivo:** además de los ISRS y duales, se podrían considerar los antidepresivos tricíclicos, ya que en algunas personas pueden tener menos efectos colaterales y adecuada respuesta terapéutica.\n- **Litio:** se recomienda como terapia coadyuvante en los trastornos depresivos que no responden a tratamiento con antidepresivos, con niveles plasmáticos entre 0,8 a 1,2 mmol/ltr.\n- **Hormona tiroidea:** la liotironina o triyodotironina, combinada con antidepresivos, mejora a quienes no tienen hipotiroidismo. La levotiroxina no parece tener el mismo efecto. No se ha demostrado utilidad en adolescentes.\n\nLa guía también indica un abordaje psicosocial. Los equipos especializados deben desarrollar todas sus habilidades psicosociales para la evaluación integral y para un plan terapéutico individual que contemple las dimensiones psicológicas, familiares, educacionales, laborales y comunitarias."
+      },
+      {
+        "id": "dep-09",
+        "answerable": true,
+        "status": "verified",
+        "latency": 5.120318625005893,
+        "contains": true,
+        "citation_precision": 0.6363636363636364,
+        "faithfulness": 0.9090909090909091,
+        "problems": [],
+        "answer": "Según la Guía Clínica GES Depresión en personas de 15 años y más (2013):\n\nTodo médico deberá realizar el diagnóstico de depresión utilizando criterios CIE-10 (nivel de evidencia 4, grado de recomendación C).\n\nCriterios del episodio depresivo según CIE-10 que aparecen en las guías cargadas:\n\n- El episodio depresivo debe durar al menos dos semanas.\n- No ha habido síntomas hipomaniacos o maniacos suficientes para cumplir los criterios del episodio hipomaniaco o maniaco en ningún período de la vida del individuo.\n- El episodio no es atribuible a abuso de sustancias psicoactivas o a trastorno mental orgánico.\n\nOtras recomendaciones sobre el proceso diagnóstico:\n\n- Se debe realizar anamnesis médica, examen de salud y pruebas de laboratorio para apoyar el diagnóstico diferencial (4 C). El resumen de recomendaciones clave lo presenta con grado 3 C.\n- Se debe descartar trastorno bipolar a la base de la sintomatología depresiva (1 A).\n- La gravedad del cuadro se determina considerando recurrencia, comorbilidades, factores psicosociales y discapacidad asociada (1 A).\n- Se recomienda solicitar hemograma, glicemia, T3, T4 y TSH a todo paciente con sospecha de depresión (4 C).\n- En adultos mayores, el diagnóstico debe incorporar el estudio de deterioro cognitivo (1 A).\n\nLa guía también presenta los criterios según CIE-10 y DSM IV-TR, pero la recomendación explícita para el médico es usar CIE-10."
+      },
+      {
+        "id": "dep-10",
+        "answerable": true,
+        "status": "verified",
+        "latency": 5.0746902500104625,
+        "contains": true,
+        "citation_precision": 0.6666666666666666,
+        "faithfulness": 1.0,
+        "problems": [],
+        "answer": "Las guías cargadas no responden del todo esta pregunta. Sí entregan información parcial sobre tolerabilidad en personas mayores.\n\n**Lo que dice la Guía Clínica GES Depresión (2013):**\n\n- En personas de edad avanzada no existe ningún fármaco ideal, ya que todos se han relacionado con problemas o efectos adversos.\n- Generalmente los ISRS son mejor tolerados que los tricíclicos.\n\n**Advertencias sobre los ISRS en personas mayores:**\n\n- Aumentan el riesgo de hemorragias y hemorragias gastrointestinales, sobre todo en personas muy ancianas, con antecedentes de riesgo o en tratamiento con AINE, esteroides o warfarina.\n- Los ancianos son especialmente propensos a desarrollar hiponatremia con ISRS, así como hipotensión postural y caídas.\n- Un estudio citado en la guía encontró un riesgo de fractura no vertebral de 2,35 (IC 95%, 1,32 - 4,18) para usuarios actuales de ISRS en comparación con personas no usuarias de antidepresivos.\n- El uso de antidepresivos tricíclicos también se asoció con mayor riesgo de fracturas, que sí disminuyó con el uso prolongado.\n\n**Recomendaciones generales de la guía:**\n\n- Utilizar un ISRS como medicamento de primera línea en episodio depresivo moderado y grave (1 A).\n- No utilizar antidepresivos tricíclicos como fármaco de primera línea (1 A).\n- El tratamiento en adultos mayores debe considerar las particularidades del curso de vida, las comorbilidades y la polifarmacia (1 A).\n\nLas guías cargadas no comparan la tolerabilidad entre los distintos ISRS ni frente a otros antidepresivos específicos en personas mayores."
+      },
+      {
+        "id": "dep-11",
+        "answerable": true,
+        "status": "verified",
+        "latency": 3.2338175830082037,
+        "contains": true,
+        "citation_precision": 0.6,
+        "faithfulness": 1.0,
+        "problems": [],
+        "answer": "La Guía Clínica GES Depresión en personas de 15 años y más (2013) recomienda utilizar como medicamento de primera línea, en episodio depresivo moderado y grave, un antidepresivo Inhibidor Selectivo de la Recaptación de Serotonina (ISRS). Grado de recomendación: 1 A.\n\nOtros puntos de la misma guía:\n\n- No se deben usar antidepresivos tricíclicos como fármaco de primera línea (1 A).\n- No existen diferencias importantes en la efectividad de los distintos antidepresivos, pero se prefieren los ISRS por su mejor perfil de efectos colaterales.\n- En la elección también deben considerarse la respuesta a tratamientos previos, el antecedente de respuesta en familiares, la comorbilidad, el costo y acceso, y las preferencias del paciente.\n- En episodios depresivos graves, la estrategia es terapia cognitivo conductual o interpersonal en conjunto con fármacos antidepresivos (1 A)."
+      },
+      {
+        "id": "dep-12",
+        "answerable": true,
+        "status": "verified",
+        "latency": 3.4586170420225244,
+        "contains": true,
+        "citation_precision": 0.4,
+        "faithfulness": 1.0,
+        "problems": [],
+        "answer": "No. La guía GES de Depresión (2013) recomienda lo contrario.\n\n- \"No utilice antidepresivos tricíclicos como fármaco de primera línea\", con nivel de evidencia y grado de recomendación 1 A.\n- Como medicamento de primera línea en episodio depresivo moderado y grave, recomienda un antidepresivo Inhibidor Selectivo de la Recaptación de Serotonina (ISRS), también 1 A.\n\nLa síntesis de evidencia de la misma guía da estos fundamentos:\n\n- Los ISRS son bien tolerados en comparación con los antidepresivos tricíclicos (ATC) y los IMAO, y generalmente se recomiendan como primera línea de tratamiento farmacológico para la depresión.\n- Hay una diferencia estadísticamente significativa a favor de otros tipos de antidepresivos para reducir el abandono del tratamiento por efectos secundarios (N= 8888; RR 0.71; IC 95%, 0.65 - 0.78).\n- En los últimos años se ha tendido a minimizar el uso de los tricíclicos, porque otros fármacos presentan un menor espectro de efectos colaterales."
+      },
+      {
+        "id": "dep-13",
+        "answerable": true,
+        "status": "verified",
+        "latency": 2.9136327499873005,
+        "contains": true,
+        "citation_precision": 0.3333333333333333,
+        "faithfulness": 1.0,
+        "problems": [],
+        "answer": "La guía clínica GES de Depresión en personas de 15 años y más (2013) recomienda lo siguiente:\n\n- En adolescentes con depresión moderada y grave, utilizar Fluoxetina en dosis inicial de 10 mg diarios, aumentando gradualmente hasta un máximo de 60 mg. al día, según respuesta. Esta recomendación tiene nivel de evidencia y grado de recomendación 1 A.\n\nLa guía también señala que los estudios farmacocinéticos en adolescentes sugieren que las dosis de ISRS deben ser distintas para niños, adolescentes y adultos, y que las dosis de Fluoxetina para adolescentes de bajo peso deberán ser menores.\n\nAdemás, el peso corporal y no la etapa de desarrollo influyen en las concentraciones de fluoxetina."
+      },
+      {
+        "id": "dep-14",
+        "answerable": true,
+        "status": "verified",
+        "latency": 4.648849292017985,
+        "contains": true,
+        "citation_precision": 0.375,
+        "faithfulness": 1.0,
+        "problems": [],
+        "answer": "La Guía Clínica GES Depresión en personas de 15 años y más (2013) recomienda lo siguiente:\n\n- El tratamiento farmacológico debe extenderse por 6 a 12 meses luego de la remisión completa de síntomas, en todos los grupos poblacionales. Grado de recomendación: nivel de evidencia 2 B.\n- Toda persona tratada por depresión, independientemente de la gravedad, debe recibir seguimiento por a lo menos 6 meses contados desde la remisión total de los síntomas (1 A).\n- Se sugiere considerar tratamiento farmacológico profiláctico en personas que han tenido tres o más episodios depresivos (1 A).\n\nLa guía también resume la evidencia que sustenta ese rango:\n\n- La guía de práctica clínica de España señala que son escasos los estudios diseñados para evaluar este aspecto y que no hay acuerdo entre las recomendaciones de distintas guías.\n- Un ensayo clínico doble ciego concluyó que el tratamiento con fluoxetina debe mantenerse por un mínimo de 26 semanas tras la recuperación, sin diferencias estadísticamente significativas a las 62 semanas.\n- Otro estudio sí encontró diferencias estadísticamente significativas a los 12 meses de mantenimiento.\n- Un metaanálisis halló un NNT menor en quienes recibieron tratamiento por 12 meses que en quienes recibieron solo 6, en un primer episodio depresivo.\n- Quienes abandonan el tratamiento antidepresivo tienen mayor riesgo de recurrencia que quienes lo siguen."
+      },
+      {
+        "id": "dep-15",
+        "answerable": true,
+        "status": "verified",
+        "latency": 6.494932625006186,
+        "contains": true,
+        "citation_precision": 0.4444444444444444,
+        "faithfulness": 1.0,
+        "problems": [],
+        "answer": "Las guías cargadas (Guía Clínica GES Depresión en personas de 15 años y más, 2013) no indican una lista de ISRS \"a evitar\". Sí entregan información sobre riesgos, que se resume a continuación.\n\n**Embarazo**\n- Durante el embarazo, los fármacos no se recomiendan como primera línea de tratamiento, a menos que haya un claro beneficio que compense los riesgos potenciales.\n- La fluoxetina es el fármaco con mayor evidencia para el tratamiento de la depresión en el embarazo, incluyendo el primer trimestre.\n- Paroxetina: la asociación mayor entre malformaciones y tratamiento con ISRS se encuentra entre la paroxetina y las malformaciones cardíacas, sin que sean totalmente concluyentes.\n- En la tabla de riesgo según la FDA, la paroxetina figura con categoría D; citalopram, escitalopram, fluoxetina y sertralina figuran con categoría C.\n- Categoría D: hay evidencia positiva de riesgo teratogénico o embriotóxico fetal humano, basada en datos de experiencias o estudios en humanos.\n- Categoría C: la información disponible sobre su seguridad durante el embarazo es limitada y debe utilizarse únicamente cuando el posible beneficio para la madre justifique el riesgo para el feto.\n- Como grupo, el riesgo de hipertensión pulmonar persistente se describe entre hijos de madres que usaron ISRS, sobre todo en la última etapa del embarazo, y aumenta con la duración del tratamiento.\n- Son necesarios más estudios para determinar si el uso de ISRS durante el último trimestre es seguro.\n\n**Lactancia**\n- En la tabla según la AAP, fluoxetina, paroxetina y sertralina figuran como \"Desc mp\"; citalopram y escitalopram figuran como \"ND\".\n- La tabla no define el significado de \"Desc mp\" ni de \"ND\" en los textos disponibles. Por eso no se puede concluir qué ISRS evitar en lactancia.\n\nLas guías cargadas no establecen una recomendación explícita de evitar un ISRS específico. Cubren riesgos en embarazo y la clasificación de riesgo de la tabla del Anexo 8."
+      },
+      {
+        "id": "dep-16",
+        "answerable": true,
+        "status": "verified",
+        "latency": 3.194071374979103,
+        "contains": true,
+        "citation_precision": 0.6666666666666666,
+        "faithfulness": 0.6666666666666666,
+        "problems": [],
+        "answer": "La Guía Clínica GES Depresión en personas de 15 años y más (2013) recomienda lo siguiente:\n\n- Solicitar Hemograma, Glicemia, T3, T4 y TSH a todo paciente con sospecha de depresión, para descartar otros trastornos o enfermedades que puedan presentar síntomas depresivos y otros exámenes según criterio médico. Nivel de evidencia y grado de recomendación: 4 C.\n\nAdemás, la guía indica que en el diagnóstico de la depresión se debe realizar una anamnesis médica, examen de salud y pruebas de laboratorio, con el fin de apoyar el diagnóstico diferencial y considerar otras comorbilidades médicas en el plan de tratamiento integral del paciente. En la sección de recomendaciones de diagnóstico figura con 4 C. En la tabla de recomendaciones clave aparece con 3 C.\n\nLas fuentes difieren en el nivel de evidencia de esta última recomendación, aunque ambas pertenecen a la misma guía (2013)."
+      },
+      {
+        "id": "dep-17",
+        "answerable": true,
+        "status": "verified",
+        "latency": 2.7924253340170253,
+        "contains": true,
+        "citation_precision": 1.0,
+        "faithfulness": 1.0,
+        "problems": [],
+        "answer": "La guía GES de Depresión en personas de 15 años y más (2013) recomienda lo siguiente:\n\n- Toda persona tratada por depresión, independientemente de la gravedad de la misma, debe recibir seguimiento por a lo menos 6 meses contados desde la remisión total de los síntomas. El grado de recomendación es 1 A.\n\nOtras recomendaciones relacionadas con la duración del tratamiento y la prevención de recaídas:\n\n- El tratamiento farmacológico debe extenderse por 6 a 12 meses luego de la remisión completa de síntomas, en todos los grupos poblacionales. El grado de recomendación es 2 B.\n- Considere utilizar tratamiento farmacológico profiláctico en personas que han tenido tres o más episodios depresivos. El grado de recomendación es 1 A."
+      },
+      {
+        "id": "dep-18",
+        "answerable": true,
+        "status": "verified",
+        "latency": 3.9928913330077194,
+        "contains": true,
+        "citation_precision": 0.4,
+        "faithfulness": 1.0,
+        "problems": [],
+        "answer": "La guía GES de Depresión en personas de 15 años y más (2013) recomienda lo siguiente:\n\n- Considerar tratamiento farmacológico profiláctico en personas que han tenido tres o más episodios depresivos (nivel de evidencia 1, grado de recomendación A).\n\nOtros puntos de la misma guía sobre prevención de recaídas y recurrencias:\n\n- Para los pacientes con un alto riesgo de recaídas, el tratamiento de mantenimiento es necesario.\n- El tratamiento farmacológico como estrategia de prevención de recaídas y recurrencias ha mostrado ser efectivo. En específico, escitalopram, venlafaxina y fluoxetina tienen respaldo de ensayos clínicos randomizados.\n- Hasta la fecha no existen ensayos clínicos randomizados que evalúen la eficacia de la terapia farmacológica de mantenimiento en atención primaria.\n- El tratamiento farmacológico debe extenderse por 6 a 12 meses luego de la remisión completa de síntomas, en todos los grupos poblacionales (nivel de evidencia 2, grado de recomendación B)."
+      },
+      {
+        "id": "dep-19",
+        "answerable": true,
+        "status": "verified",
+        "latency": 3.244660417025443,
+        "contains": true,
+        "citation_precision": 0.25,
+        "faithfulness": 1.0,
+        "problems": [],
+        "answer": "Sí. La guía indica que se debe realizar tamizaje de depresión en personas con consumo de sustancias y abuso de alcohol (nivel de evidencia y grado de recomendación 2 B).\n\nFuente: Guía Clínica GES Depresión en personas de 15 años y más (2013).\n\nOtros datos de la misma guía:\n- Se estima que la prevalencia de abuso de substancias entre personas con depresión mayor alcanza entre un 8 y un 21%.\n- El AUDIT puede ayudar a detectar el consumo de riesgo de alcohol.\n- Como instrumento de tamizaje, el GHQ-12 está validado en Chile para personas de 15 años y más, y se considera sospecha de depresión un puntaje igual o mayor de 5 puntos."
+      },
+      {
+        "id": "dep-20",
+        "answerable": true,
+        "status": "retracted",
+        "latency": 4.433569542015903,
+        "contains": true,
+        "citation_precision": 0.6,
+        "problems": [
+          "Dato numérico sin cita: «El grado es 1 A.\n\nSobre el embarazo, la guía solo describe la evidencia disponible:\n\n- Una revisión publicada en 2009 in»"
+        ],
+        "answer": "La guía GES de Depresión (2013) recomienda la terapia electroconvulsiva solo en un escenario:\n\n- En la depresión grave resistente a tratamiento se puede utilizar Terapia electroconvulsiva modificada. El grado de recomendación es 1 A.\n\nAntes de llegar a ese punto, la guía plantea lo siguiente para las depresiones resistentes o refractarias:\n\n- Se debe reevaluar el diagnóstico inicial, sospechar trastorno bipolar, comorbilidad o trastorno de personalidad. El grado es 2 B.\n- Se debe optimizar dosis o cambiar antidepresivo, y/o potenciar con litio, liotironina o un segundo antidepresivo. El grado es 1 A.\n\nSobre el embarazo, la guía solo describe la evidencia disponible:\n\n- Una revisión publicada en 2009 incluyó N=339 casos, la mayoría tratadas por depresión. De estos casos, al menos un 78% obtuvo remisión parcial de síntomas.\n- Esa revisión también informó que 11 de las pacientes presentaron complicaciones neonatales relacionadas directamente con la terapia electroconvulsiva (2 muertes incluidas), mientras que 18 mujeres reportaron complicaciones maternas.\n\nLos resultados no entregan una recomendación formal específica para el embarazo, ni detallan contraindicaciones ni el esquema de aplicación."
+      },
+      {
+        "id": "dep-21",
+        "answerable": true,
+        "status": "verified",
+        "latency": 3.5872103339934256,
+        "contains": true,
+        "citation_precision": 0.25,
+        "faithfulness": 1.0,
+        "problems": [],
+        "answer": "La guía GES de Depresión (2013) no indica una dosis diaria de litio. Sí señala un nivel plasmático de referencia.\n\n- Se recomienda la potenciación con litio como terapia coadyuvante en los trastornos depresivos que no responden a tratamiento con antidepresivos, con niveles plasmáticos entre 0,8 a 1,2 mmol/ltr.\n- La recomendación clave de optimizar la dosis o cambiar el antidepresivo, y/o potenciar con litio, liotironina o un segundo antidepresivo, tiene grado 1 A.\n\nSobre la respuesta esperada, la misma guía indica que la aumentación con carbonato de litio está bien documentada y puede ser de utilidad en un 50% de los casos no respondedores, al cabo de 2 a 3 semanas. También advierte que es necesario tener en consideración algunos casos de síndrome serotoninérgico descritos durante la aumentación con litio.\n\nLas guías cargadas no entregan una dosis inicial ni una dosis diaria en mg de litio para esta indicación."
+      },
+      {
+        "id": "fuera-01",
+        "answerable": false,
+        "status": "abstained",
+        "latency": 2.3929610830091406,
+        "problems": [],
+        "answer": "Las guías cargadas no responden esta pregunta.\n\nSí cubren temas cercanos de la Guía GES Diabetes Mellitus tipo 2 (2017): tratamiento de primera y segunda línea en personas adultas con DM2, uso de sulfonilureas, inhibidores de DPP4, SGLT2 y análogos de GLP-1, e indicaciones de insulina (NPH versus análogos)."
+      },
+      {
+        "id": "fuera-02",
+        "answerable": false,
+        "status": "abstained",
+        "latency": 1.6786936249991413,
+        "problems": [],
+        "answer": "Las guías cargadas no responden esta pregunta.\n\nCubren temas cercanos de diabetes mellitus tipo 2 en personas adultas (guía GES 2017): metas de HbA1c, tratamiento de primera y segunda línea, criterios para iniciar insulina y elección entre insulina NPH y análogos."
+      },
+      {
+        "id": "fuera-03",
+        "answerable": false,
+        "status": "abstained",
+        "latency": 1.4546334579936229,
+        "problems": [],
+        "answer": "Las guías cargadas no responden esta pregunta.\n\nCubren otros temas cercanos de la guía GES Diabetes Mellitus tipo 2 (2017): metas de HbA1c en adultos mayores frágiles, tratamiento farmacológico de primera y segunda línea, y criterios para iniciar insulina."
+      },
+      {
+        "id": "fuera-04",
+        "answerable": false,
+        "status": "abstained",
+        "latency": 3.3973534160177223,
+        "problems": [],
+        "answer": "Las guías cargadas no responden esta pregunta.\n\nSí cubren temas cercanos, todos de la Guía Clínica GES Depresión en personas de 15 años y más (2013):\n\n- Indagar historia de manía, hipomanía y antecedentes familiares de trastorno bipolar en todo paciente con trastorno depresivo, y evaluar el uso del MDQ (Mood Disorder Questionnaire) como tamizaje.\n- Elementos para distinguir un trastorno depresivo unipolar de un trastorno bipolar con episodio actual depresivo.\n- El uso de antidepresivos en trastorno bipolar con episodio actual depresivo puede tener efectos adversos en el pronóstico a largo plazo.\n- Criterios diagnósticos CIE-10 del trastorno bipolar, por ejemplo episodio actual maníaco sin síntomas psicóticos (F31.1).\n\nPara el tratamiento del trastorno bipolar, la guía remite a la Guía de Práctica Clínica para el Tratamiento de personas con Trastorno Bipolar. Ese documento no está entre los resultados entregados."
+      },
+      {
+        "id": "fuera-05",
+        "answerable": false,
+        "status": "no_evidence",
+        "latency": 0.12306445799185894,
+        "problems": [],
+        "answer": ""
+      },
+      {
+        "id": "fuera-06",
+        "answerable": false,
+        "status": "no_evidence",
+        "latency": 0.040869500022381544,
+        "problems": [],
+        "answer": ""
+      },
+      {
+        "id": "fuera-07",
+        "answerable": false,
+        "status": "no_evidence",
+        "latency": 0.046182582998881117,
+        "problems": [],
+        "answer": ""
+      },
+      {
+        "id": "fuera-08",
+        "answerable": false,
+        "status": "no_evidence",
+        "latency": 0.04264208397944458,
+        "problems": [],
+        "answer": ""
+      },
+      {
+        "id": "fuera-09",
+        "answerable": false,
+        "status": "abstained",
+        "latency": 1.850609415996587,
+        "problems": [],
+        "answer": "Las guías cargadas no responden esta pregunta.\n\nLos resultados cubren solo el tamizaje de depresión en personas de 15 años y más (guía GES 2013): población objetivo, instrumentos como GHQ-12, PHQ-9 y Escala de Edimburgo, puntajes de corte y momentos de aplicación."
+      },
+      {
+        "id": "fuera-10",
+        "answerable": false,
+        "status": "no_evidence",
+        "latency": 0.11520162501255982,
+        "problems": [],
+        "answer": ""
+      }
+    ]
+  }
+}

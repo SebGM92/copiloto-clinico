@@ -65,7 +65,7 @@ def plain(text):
 
 def run(question, rows, events=(), stop_reason="end_turn"):
     pool, client = FakePool(rows), FakeClient(list(events), stop_reason)
-    graph = build_graph(pool, HashingEmbedder(), client, model="modelo", top_k=8, min_similarity=0.45)
+    graph = build_graph(pool, HashingEmbedder(), client, model="modelo", top_k=8, min_similarity=0.55)
 
     async def go():
         custom, final = [], None
@@ -94,11 +94,17 @@ def test_measles_question_in_hypertension_corpus_never_reaches_the_model():
 
 
 def test_hta_in_pregnancy_reaches_the_model_and_the_model_abstains():
-    # Comparte términos con el corpus (keyword hit) aunque la similitud sea baja: el modelo decide
+    # Trampa: se parece al corpus (similitud sobre el umbral), así que llega al modelo y es él quien se abstiene
     events = plain("Las guías cargadas no responden esta pregunta. Cubren el tratamiento de la HTA en adultos.")
-    final, _, _, client = run("¿Qué antihipertensivo usar en el embarazo?", [row(0.30, 1)], events)
+    final, _, _, client = run("¿Qué antihipertensivo usar en el embarazo?", [row(0.62, 1)], events)
     assert client.kwargs is not None
     assert final["status"] == "abstained"
+
+
+def test_shared_common_word_alone_does_not_reach_the_model():
+    # Fase 8: con la búsqueda léxica en OR, "tratamiento" coincide casi siempre; sin similitud no basta
+    final, _, _, client = run("¿Cuál es el tratamiento de la tuberculosis?", [row(0.46, 1)])
+    assert final["status"] == "no_evidence" and client.kwargs is None
 
 
 def test_cited_answer_is_verified_and_streams_events_in_order():

@@ -118,3 +118,28 @@ def test_answer_naming_idpp4_without_citation_is_verified():
     blocks = [AnswerBlock("La guía GES de Diabetes Mellitus tipo 2 (2017) recomienda metformina con iDPP4."),
               AnswerBlock("Losartán 50 mg al día.", [cite()])]
     assert verify(blocks, [DM2]).status == "verified"
+
+
+# Fase 8: Claude comenta el grado de recomendación en una frase aparte, sin cita ("El grado es 1 A")
+GRADED = RetrievedChunk(**{**CHUNK.__dict__, "paragraphs": [
+    {"page": 42, "para": 1, "text": "| Utilizar como primera línea un ISRS. | 1 A |", "kind": "table"}]})
+
+
+def test_grade_mentioned_without_citation_passes_if_that_grade_is_cited():
+    blocks = [AnswerBlock("Se recomienda un ISRS como primera línea.",
+                          [Citation(0, 0, 1, "| Utilizar como primera línea un ISRS. | 1 A |")]),
+              AnswerBlock(" El nivel de evidencia y grado de recomendación es 1 A.")]
+    assert verify(blocks, [GRADED]).status == "verified"
+
+
+def test_grade_that_no_citation_supports_is_retracted():
+    blocks = [AnswerBlock("Se recomienda un ISRS como primera línea.",
+                          [Citation(0, 0, 1, "| Utilizar como primera línea un ISRS. | 1 A |")]),
+              AnswerBlock(" El grado de recomendación es 2 B.")]
+    assert verify(blocks, [GRADED]).status == "retracted"
+
+
+def test_grade_stripping_does_not_hide_doses():
+    blocks = [AnswerBlock("Un ISRS (1 A).", [Citation(0, 0, 1, "| Utilizar como primera línea un ISRS. | 1 A |")]),
+              AnswerBlock(" Dosis de 20 mg.")]
+    assert verify(blocks, [GRADED]).status == "retracted"

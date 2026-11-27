@@ -40,6 +40,7 @@ from tests.fake_anthropic import FakeAnthropic  # noqa: E402
 from tests.make_fake_guide import LOSARTAN, make_fake_guide  # noqa: E402
 
 SCHEMA = Path(__file__).resolve().parent.parent / "schema.sql"
+DEMO_MIN_SIMILARITY = 0.3  # hashing: con respuesta 0.37-0.46, sarampión 0.12
 STRENGTH = "Recomendación fuerte, certeza de la evidencia moderada."
 ABSTENTION = ("Las guías cargadas no responden esta pregunta. "
               "La guía cargada cubre el tratamiento farmacológico de la hipertensión en adultos y su seguimiento.")
@@ -90,7 +91,9 @@ def main() -> None:
     fake = DemoAnthropic()
     client = AsyncAnthropic(api_key="sk-demo", http_client=httpx2.AsyncClient(transport=fake.transport()))
     print(f"Demo con la guía ficticia en {DEMO_URL}. API en http://localhost:8000")
-    uvicorn.run(create_app(embedder=HashingEmbedder(), client=client), host="127.0.0.1", port=8000)
+    # Umbral para el embedder de hashing (sus similitudes son mucho más bajas que las de bge-m3)
+    uvicorn.run(create_app(embedder=HashingEmbedder(), client=client, min_similarity=DEMO_MIN_SIMILARITY),
+                host="127.0.0.1", port=8000)
 
 
 if __name__ == "__main__":

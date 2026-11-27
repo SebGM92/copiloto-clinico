@@ -136,6 +136,48 @@ Por qué:
 - **La espera es acotada y visible.** 3 a 6 s con etapas en pantalla es aceptable para una consulta de apoyo, no de urgencia vital.
 - **No cuesta nada en el backend.** El streaming sigue igual; si en el futuro se quiere la otra opción, solo cambia el frontend.
 
+## Evaluación de alucinaciones (Fase 8)
+
+Set dorado en `backend/eval/golden.jsonl`: 51 preguntas, 41 con respuesta en las guías y 10 sin ella (5 son trampas que comparten palabras con el corpus). **Es un borrador redactado por Claude, pendiente de revisión clínica** (ver `backend/eval/README.md`). Se evalúa con `backend/eval/run_eval.py`:
+
+```bash
+cd backend && set -a && source .env && set +a
+python -m eval.run_eval retrieval          # gratis: ¿llega la página correcta al modelo?
+python -m eval.run_eval full --judge       # grafo completo + juez Claude Haiku 5.5 (~$1,25)
+python -m eval.run_eval full --demo --golden eval/golden_ficticia.jsonl   # prueba el evaluador sin costo
+```
+
+### Resultados
+
+| Métrica | Qué mide | Meta | Resultado |
+|---|---|---|---|
+| `hit_rate` | La página correcta está entre los 8 fragmentos que ve el modelo | ≥ 0,85 | **0,976** ✓ |
+| `mrr` | Qué tan arriba aparece | ≥ 0,6 | **0,780** ✓ |
+| `false_answer_rate` | Preguntas sin respuesta que salieron `verified` | 0 | **0** ✓ |
+| `answered_verified` | Preguntas con respuesta que salieron `verified` | ≥ 0,8 | **0,780** ✗ (32 de 41) |
+| `retracted` | Respuestas retiradas por la verificación | baja | 0,137 (7 de 51) |
+| `must_contain` | Las respuestas verificadas traen los datos clave | ≥ 0,9 | **1,000** ✓ |
+| `citation_precision` | Las citas apuntan a las páginas esperadas | ≥ 0,8 | 0,624 ✗ |
+| `faithfulness` | Juez Haiku 5.5: la cita respalda cada afirmación | ≥ 0,95 | **0,968** ✓ |
+| `latency_p50_s` / `p95_s` | Tiempo de respuesta | — | 3,6 s / 6,1 s |
+
+Resultados completos (con cada respuesta) en `backend/eval/results/`.
+
+### Qué cambió al medir
+
+1. **Chequeo de evidencia: solo similitud ≥ 0,55.** La regla original dejaba pasar una pregunta con similitud alta **o** alguna palabra en común. Con la búsqueda léxica en OR, las 10 preguntas sin respuesta compartían alguna palabra ("tratamiento", "niños") y todas llegaban a Claude. Con bge-m3, las preguntas con respuesta tienen similitud ≥ 0,586 y las fuera de tema 0,431-0,510; ahora 5 de 10 se descartan sin gastar tokens. Las trampas (0,60-0,66) no se pueden separar por similitud: llegan al modelo, que se abstiene. El margen es corto (0,586 contra 0,55) y se vigila en cada evaluación.
+2. **Un error del set dorado.** La trampa "¿dosis de litio para potenciar un antidepresivo?" salió `verified`, pero la respuesta era correcta: la guía da el nivel plasmático (0,8 a 1,2 mmol/l), aunque no la dosis en mg. El caso pasó a tener respuesta (`dep-21`) y se agregó otra trampa (aspirina en DM2). Sin este error, `false_answer_rate` siempre fue 0.
+3. **Grados de recomendación sin cita.** 10 de 11 retiradas venían de frases como "El grado de recomendación es 1 A", sin cita. Ahora un grado escrito fuera de la cita se acepta solo si ese mismo grado aparece citado en la respuesta. `answered_verified` subió de 0,675 a 0,780 y las retiradas del 22 % al 13,7 %.
+4. **El evaluador se cortaba** con un error de red a mitad del streaming, que el SDK no reintenta. Ahora reintenta cada caso, guarda después de cada uno y da al juez la respuesta completa como contexto, porque cada bloque citado es a veces un fragmento ("<8 %").
+
+### Lo que queda
+
+- **Las 7 retiradas son la regla funcionando:** Claude agrega números sin cita en títulos, resúmenes o comentarios propios ("**Meta más estricta (menor a 6.5%):**", "Adolescentes hasta 18 años:", una revisión "publicada en 2009"). Se podría pedir en el prompt que no resuma números fuera de las frases citadas.
+- **Una respuesta dejó ver el prompt:** empezó con "Rule 5: no puedo indicar una conducta…". Conviene que el prompt no numere reglas que el modelo pueda repetir.
+- **`citation_precision` mide sobre todo el set dorado:** marca como correctas solo las páginas de la recomendación, y Claude también cita, con razón, las páginas de evidencia y resultados. Para que sea útil hay que ampliar `pages` al revisar el set.
+- **Dos preguntas se abstienen con respuesta en las guías:** `dm2-20` (la búsqueda no trae la página) y `dm2-16` (la página llega, pero el modelo no ve la lista de fármacos excluidos).
+- **El set lo escribió Claude.** Tiende a usar el vocabulario de la guía y favorece a la búsqueda; falta validarlo con un médico y sumar preguntas reales.
+
 ## Limitaciones conocidas
 
 - **Flujogramas:** si son imágenes, su contenido se pierde. Si están dibujados con texto vectorial (como el algoritmo de la guía de DM2), la página se detecta y se descarta, porque sus etiquetas sueltas ("Sí", "No", "¿Cumple meta?") solo meten ruido. En ambos casos, la información suele estar también en el texto de la guía.
