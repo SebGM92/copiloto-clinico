@@ -23,7 +23,15 @@ export default function Home() {
   const showAnswer = blocks.length > 0 && (final?.status === "verified" || final?.status === "abstained");
 
   return (
-    <main className="mx-auto grid w-full max-w-6xl gap-8 p-8 lg:grid-cols-[3fr_2fr]">
+    <main className="mx-auto grid w-full max-w-6xl gap-8 p-8 pb-24 lg:grid-cols-[3fr_2fr]">
+      {/* Fijo al pie: visible siempre, aunque la respuesta sea larga */}
+      <p
+        role="note"
+        className="fixed inset-x-0 bottom-0 z-10 border-t border-amber-200 bg-amber-50 px-4 py-2 text-center text-xs text-amber-900"
+      >
+        Demo educativa sobre guías clínicas públicas. No reemplaza el juicio clínico profesional y no debe
+        usarse con datos de pacientes.
+      </p>
       <section>
         <h1 className="text-2xl font-semibold">Copiloto clínico</h1>
         <p className="mt-1 text-sm text-gray-500">Responde solo con las guías cargadas. Cada afirmación lleva su fuente.</p>
@@ -79,10 +87,6 @@ export default function Home() {
           </ul>
         )}
 
-        <p className="mt-10 text-xs text-gray-400">
-          Demo educativa. Apoya la consulta de guías clínicas; no reemplaza el juicio profesional
-          ni debe usarse con datos de pacientes.
-        </p>
       </section>
 
       <aside>

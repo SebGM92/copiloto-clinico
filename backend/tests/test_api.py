@@ -93,6 +93,21 @@ def test_blocked_question_never_reaches_the_model_and_the_run_is_not_logged(api)
     assert status == "blocked" and "12.345.678" not in question
 
 
+def test_rate_limit_per_ip_answers_429_without_reaching_the_model():
+    try:
+        psycopg.connect(config.DATABASE_URL, connect_timeout=2).close()
+    except psycopg.OperationalError:
+        pytest.skip("PostgreSQL no disponible")
+    client = CitingClient()
+    app = create_app(embedder=HashingEmbedder(), client=client, min_similarity=0.0, rate_limit=(2, 600))
+    with TestClient(app) as http:
+        codes = [http.post("/api/chat", json={"question": "Paciente 12.345.678-5"}).status_code for _ in range(3)]
+        assert codes == [200, 200, 429]
+        r = http.post("/api/chat", json={"question": f"¿Dosis de losartán? {MARK}"})
+        assert r.status_code == 429 and "Demasiadas preguntas" in r.json()["detail"]
+    assert client.calls == 0
+
+
 def test_question_validation(api):
     http, _, _ = api
     assert http.post("/api/chat", json={"question": "hi"}).status_code == 422

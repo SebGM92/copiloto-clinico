@@ -1,8 +1,9 @@
 import time
+from collections import defaultdict, deque
 from contextlib import asynccontextmanager
 
 from anthropic import AsyncAnthropic
-from fastapi import FastAPI, Request
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.sse import EventSourceResponse, ServerSentEvent
 from pgvector.psycopg import register_vector_async
@@ -19,12 +20,28 @@ async def _configure(conn):
     await register_vector_async(conn)
 
 
-def create_app(embedder=None, client=None, min_similarity: float | None = None) -> FastAPI:
+def create_app(embedder=None, client=None, min_similarity: float | None = None,
+               rate_limit: tuple[int, int] | None = None) -> FastAPI:
     """Fábrica de la app: los tests inyectan un embedder y un cliente de Anthropic falsos.
 
     min_similarity: el umbral está calibrado para bge-m3; con el embedder de hashing
     las similitudes son mucho más bajas y hay que pasar otro.
+    rate_limit: (preguntas, segundos) por IP; por defecto RATE_LIMIT_REQUESTS / RATE_LIMIT_WINDOW_S.
     """
+    max_requests, window_s = rate_limit or (config.RATE_LIMIT_REQUESTS, config.RATE_LIMIT_WINDOW_S)
+    recent: dict[str, deque] = defaultdict(deque)
+
+    def limit_by_ip(request: Request) -> None:
+        """Ventana deslizante en memoria. Detrás de un proxy, request.client.host es el proxy:
+        hay que configurar uvicorn con --proxy-headers para usar la IP real del cliente."""
+        ip = request.client.host if request.client else "desconocida"
+        now = time.monotonic()
+        times = recent[ip]
+        while times and now - times[0] > window_s:
+            times.popleft()
+        if len(times) >= max_requests:
+            raise HTTPException(429, f"Demasiadas preguntas: máximo {max_requests} cada {window_s // 60} minutos.")
+        times.append(now)
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
@@ -56,7 +73,7 @@ def create_app(embedder=None, client=None, min_similarity: float | None = None) 
             cols = [c.name for c in cur.description]
             return [dict(zip(cols, row)) for row in await cur.fetchall()]
 
-    @app.post("/api/chat", response_class=EventSourceResponse)
+    @app.post("/api/chat", response_class=EventSourceResponse, dependencies=[Depends(limit_by_ip)])
     async def chat(body: Question, request: Request):
         started = time.monotonic()
         final: dict = {}

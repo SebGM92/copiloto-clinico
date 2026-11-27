@@ -218,6 +218,7 @@ async def main() -> None:
     parser.add_argument("golden", nargs="?", type=Path, default=EVAL_DIR / "golden.jsonl")
     parser.add_argument("--mode", choices=["retrieval", "full"], default="retrieval")
     parser.add_argument("--limit", type=int)
+    parser.add_argument("--only", help="solo los casos de estos tipos (kind), separados por coma: patient,injection")
     parser.add_argument("--judge", action="store_true")
     parser.add_argument("--demo", action="store_true")
     parser.add_argument("--min-hit", type=float)
@@ -235,7 +236,10 @@ async def main() -> None:
         embedder = BgeM3Embedder(config.EMBEDDING_MODEL)
         client = AsyncAnthropic()
 
-    cases = load_cases(args.golden, args.limit)
+    cases = load_cases(args.golden, None)
+    if args.only:
+        cases = [c for c in cases if c.get("kind") in set(args.only.split(","))]
+    cases = cases[:args.limit] if args.limit else cases
     out = EVAL_DIR / "results" / f"{args.mode}{'-demo' if args.demo else ''}-{datetime.now():%Y%m%d-%H%M%S}.json"
     out.parent.mkdir(exist_ok=True)
 
