@@ -63,6 +63,7 @@ Advertencias sobre estos números:
 ## Limitaciones conocidas
 
 - **Flujogramas:** si son imágenes, su contenido se pierde. Si están dibujados con texto vectorial (como el algoritmo de la guía de DM2), la página se detecta y se descarta, porque sus etiquetas sueltas ("Sí", "No", "¿Cumple meta?") solo meten ruido. En ambos casos, la información suele estar también en el texto de la guía.
+- **Bloqueo de datos de pacientes (`guard.py`):** solo detecta RUNs con dígito verificador válido y preguntas de más de 2000 caracteres. No detecta un RUN escrito sin dígito verificador ("RUN 12.345.678"), nombres, fechas de nacimiento ni direcciones. Además, un celular de 9 dígitos escrito todo junto ("912345678") se bloquea por error cerca del 9 % de las veces, porque su último dígito calza por azar como dígito verificador (con espacios o "+56" no pasa).
 - **Reingesta tras cambiar el parser:** la ingesta decide por el SHA-256 del PDF, así que un cambio en el parser o el chunker no reingesta nada por sí solo. Hay que borrar el documento (`DELETE FROM documents WHERE slug = ...`) y volver a correr el script.
 - **Etiquetas de flujograma alineadas:** si varias cajas comparten exactamente la misma línea base, PyMuPDF las une en una sola línea y la página puede no detectarse como flujograma.
 

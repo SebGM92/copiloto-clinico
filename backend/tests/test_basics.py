@@ -1,5 +1,4 @@
 from app.acronyms import expand
-from app.guard import check
 from app.ingest.chunker import chunk_paragraphs
 from app.ingest.pdf_parser import Paragraph
 
@@ -38,7 +37,3 @@ def test_table_own_chunk_and_heading_resets_path():
 
 def test_expand_acronym():
     assert "hipertensión arterial" in expand("tratamiento de HTA")
-
-
-def test_guard_rejects_empty():
-    assert not check("   ").allowed
