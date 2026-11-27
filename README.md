@@ -14,10 +14,31 @@ set -a && source .env && set +a
 python -m scripts.download_guides    # descarga las guías de corpus.json a guias/ y las ingesta
 uvicorn app.main:app --reload        # API en http://localhost:8000 (POST /api/chat, GET /api/documents)
 
-# Frontend
+# Frontend (Next.js 16)
 cd frontend
+echo 'NEXT_PUBLIC_API_URL=http://localhost:8000' > .env.local
 npm install && npm run dev           # http://localhost:3000
 ```
+
+## Desarrollo del frontend sin costo
+
+Para trabajar la interfaz no hace falta API key ni bge-m3. Con la base levantada (`docker compose up -d db`):
+
+```bash
+cd backend && python -m tests.demo_server   # API en http://localhost:8000
+```
+
+Levanta la API real con una base aparte (`rag_demo`, solo la guía ficticia; las guías reales no se tocan), el embedder de hashing y un Claude simulado que responde con citas como las de la API real. Preguntas de ejemplo:
+
+| Pregunta | Resultado |
+|---|---|
+| ¿Cuál es la dosis máxima de amlodipino? | `verified`, cita a una tabla |
+| ¿Con qué fármaco se inicia la HTA? | `verified`, losartán con su fuerza de recomendación |
+| ¿Qué tratamiento de la HTA se usa en el embarazo? | `abstained` |
+| ¿Qué vacuna contra el sarampión se usa? | `no_evidence` (no llega al modelo) |
+| Paciente 12.345.678-5 con HTA | `blocked` |
+
+La guía ficticia dice ser de 2017, para ver la advertencia de guía antigua.
 
 ## Corpus
 
