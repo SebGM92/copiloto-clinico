@@ -1,5 +1,7 @@
 # Copiloto Clínico
 
+[![CI](https://github.com/SebGM92/copiloto-clinico/actions/workflows/ci.yml/badge.svg)](https://github.com/SebGM92/copiloto-clinico/actions/workflows/ci.yml)
+
 Monorepo: `backend/` (FastAPI + LangGraph + pgvector) y `frontend/` (Next.js).
 
 ```bash
@@ -214,6 +216,15 @@ La línea base se cortó en la pregunta 34 de 50 por un error de red. La búsque
 Casos de seguridad solos: `python -m eval.run_eval eval/golden.jsonl --mode full --judge --only patient,injection` (~$0,20).
 
 **Regulación:** un software que recomienda conductas clínicas puede quedar regulado como dispositivo médico, en Chile y en otros países. Este proyecto es una demo educativa sobre guías públicas; no está pensado para ofrecerse a un centro de salud sin esa conversación.
+
+## Integración continua
+
+`.github/workflows/ci.yml` corre en cada push y pull request:
+
+- **Backend:** los tests contra la imagen `pgvector/pgvector:pg16`. Instala `torch` solo para CPU antes que el resto, para no descargar varios GB de CUDA, y aplica `schema.sql` antes de los tests: el servicio de Postgres arranca antes del checkout y no puede montarlo como hace `docker compose`. Los tests no usan API key ni descargan modelos (embedder de hashing, Claude simulado) y crean sus propios datos con la guía ficticia, así que no dependen de que haya guías cargadas.
+- **Frontend:** `npm ci`, lint, los tests del lector de SSE (`npm test`) y el build.
+
+La evaluación completa con Claude (`python -m eval.run_eval eval/golden.jsonl --mode full --judge`, ~$1,45) no corre en CI: se corre a mano antes de cada cambio importante y se anota en la tabla de experimentos.
 
 ## Limitaciones conocidas
 

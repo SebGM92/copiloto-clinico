@@ -8,10 +8,13 @@ from fastapi.testclient import TestClient
 
 from app import config
 from app.embeddings import HashingEmbedder
+from app.ingest.cli import ingest
 from app.main import create_app
+from tests.make_fake_guide import make_fake_guide
 from tests.test_llm import FakeStream, text_block
 
 MARK = "zz-test-api"  # para encontrar y borrar las filas de queries que crean estos tests
+SLUG = "test-api-ficticia"  # guía propia: los tests no dependen de lo que haya en la base
 
 
 class CitingClient:
@@ -33,14 +36,18 @@ class CitingClient:
 
 
 @pytest.fixture(scope="module")
-def api():
+def api(tmp_path_factory):
     try:
         db = psycopg.connect(config.DATABASE_URL, autocommit=True, connect_timeout=2)
     except psycopg.OperationalError:
         pytest.skip("PostgreSQL no disponible")
+    db.execute("DELETE FROM documents WHERE slug = %s", (SLUG,))
+    ingest(db, HashingEmbedder(), str(make_fake_guide(tmp_path_factory.mktemp("pdf") / "g.pdf")), slug=SLUG,
+           title="Guía FICTICIA de hipertensión", year=2024, url="https://example.org/f.pdf", publisher="Ficticio")
     client = CitingClient()
     with TestClient(create_app(embedder=HashingEmbedder(), client=client, min_similarity=0.0)) as http:
         yield http, client, db
+    db.execute("DELETE FROM documents WHERE slug = %s", (SLUG,))
     db.execute("DELETE FROM queries WHERE question LIKE %s OR answer LIKE %s", (f"%{MARK}%", f"%{MARK}%"))
     db.execute("DELETE FROM queries WHERE question = '[bloqueada: contenía datos de paciente]' "
                "AND at > now() - interval '5 minutes'")
@@ -63,7 +70,9 @@ def last_query(db):
 def test_documents_lists_guides_with_chunk_counts(api):
     http, _, _ = api
     docs = http.get("/api/documents").json()
-    assert docs and all({"slug", "title", "year", "source_url", "chunks"} <= d.keys() for d in docs)
+    assert all({"slug", "title", "year", "source_url", "chunks"} <= d.keys() for d in docs)
+    ours = next(d for d in docs if d["slug"] == SLUG)
+    assert ours["year"] == 2024 and ours["chunks"] > 0
 
 
 def test_chat_streams_stages_answer_and_verdict_and_logs_the_query(api):
@@ -80,7 +89,7 @@ def test_chat_streams_stages_answer_and_verdict_and_logs_the_query(api):
 
     question, status, answer, chunk_ids, problems, latency = last_query(db)
     assert MARK in question and status == "verified" and answer.startswith("Según la guía")
-    assert len(chunk_ids) == config.TOP_K and problems == [] and latency >= 0
+    assert 0 < len(chunk_ids) <= config.TOP_K and problems == [] and latency >= 0
 
 
 def test_blocked_question_never_reaches_the_model_and_the_run_is_not_logged(api):

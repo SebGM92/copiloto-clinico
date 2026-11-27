@@ -98,6 +98,6 @@ def test_every_search_result_has_citations_enabled(e2e):
     chat(http, fake, [("Las guías cargadas no responden esta pregunta.", None)])
     body = fake.requests[-1]
     results = [b for b in body["messages"][0]["content"] if b["type"] == "search_result"]
-    assert len(results) == config.TOP_K
+    assert 0 < len(results) <= config.TOP_K
     assert all(r["citations"] == {"enabled": True} for r in results)  # todos o ninguno: mezclar da error
     assert body["max_tokens"] == 4000 and body["output_config"] == {"effort": "low"}
